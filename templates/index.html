@@ -413,7 +413,7 @@ label.f > span{font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
 </style>
 </head>
 <body>
-<script>window.SCHULPLANER_WEB = true;</script>
+<script>window.SCHULPLANER_WEB = true; window.SCHULPLANER_OCR = "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js";</script>
 
 
 <div id="gate" class="gate" hidden></div>
@@ -988,7 +988,7 @@ function render() {
   const n = nudges().length;
   $("#bellbtn").innerHTML = svg("glocke") + (n ? '<span class="badge">' + n + "</span>" : "");
   $("#profbtn").innerHTML = '<span class="avatar mini" style="--h:' + profil.h + '">' + esc(profZeichen(profil)) + "</span>";
-  const kamOk = !!(SAMPLE && SAMPLE_LIMITS && SAMPLE_LIMITS.images);
+  const kamOk = kannFoto();
   $("#fab").innerHTML =
     '<button class="fb alt" data-act="fabha" aria-label="Hausaufgabe eintragen">' + svg("plus") + "<span>Hausaufgabe</span></button>" +
     '<button class="fb prim" data-act="fabscan">' + svg(kamOk ? "kamera" : "stift") + (kamOk ? "Lernziel scannen" : "Lernziel eintragen") + "</button>";
@@ -1225,41 +1225,46 @@ function viewLernen() {
 }
 
 function viewScan() {
-  const bilder = SAMPLE_LIMITS && SAMPLE_LIMITS.images;
-  let s = '<section class="sec"><div class="card hero"><span class="tag">' + (SAMPLE ? "Lernziele einlesen" : "Arbeiten und Lernziele") + "</span>" +
+  const bilder = kannFoto();
+  const nurOCR = !SAMPLE && !!OCR_URL;
+  let s = '<section class="sec"><div class="card hero"><span class="tag">' + (bilder ? "Lernziele einlesen" : "Arbeiten und Lernziele") + "</span>" +
     (SAMPLE ? "<h1>Foto rein, Lernplan raus</h1>" +
       '<p class="sub">Fotografiere den Lernzielkatalog, das Arbeitsblatt oder das Tafelbild. Erkannt wird von selbst, ob es ein Test oder Hausaufgaben sind. Passend für Klasse ' + esc(profil.klasse) + ".</p>"
-      : "<h1>Tests und Themen</h1>" +
-      '<p class="sub">Trag deine Arbeiten mit ihren Themen ein. Der Kalender, der Lernstand, die Noten und die Aufwandsrechnung arbeiten damit weiter.</p>') +
+      : nurOCR ? "<h1>Foto rein, Themen raus</h1>" +
+        '<p class="sub">Fotografiere deinen Lernzielkatalog. Die Texterkennung läuft auf deinem Gerät, nichts wird verschickt. Gedruckten Text liest sie gut, Handschrift schlecht.</p>'
+        : "<h1>Tests und Themen</h1>" +
+        '<p class="sub">Trag deine Arbeiten mit ihren Themen ein. Der Kalender, der Lernstand, die Noten und die Aufwandsrechnung arbeiten damit weiter.</p>') +
     "</div></section>";
-  if (!SAMPLE) return s + '<section class="sec"><div class="card" style="padding:16px">' +
+  if (!bilder) return s + '<section class="sec"><div class="card" style="padding:16px">' +
     '<b style="font-family:var(--disp)">Diese Fassung liest keine Fotos</b>' +
-    '<p class="sm muted" style="margin-top:6px">Das Auslesen von Bildern, die Karteikarten, das Quiz und die Erklärungen brauchen Claude. Sie laufen nur in der Fassung, die du über deinen Claude-Konto-Link öffnest. Alles andere, also Hausaufgaben, Kalender, Stundenplan, Noten und Ziele, funktioniert hier genauso.</p>' +
+    '<p class="sm muted" style="margin-top:6px">Alles andere, also Hausaufgaben, Kalender, Stundenplan, Noten und Ziele, funktioniert hier genauso.</p>' +
     '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="neuertest">' + svg("plus") + "Test von Hand eintragen</button></div></div></section>";
   const sc = ui.scan;
   if (!sc || sc.phase === "leer") {
     s += '<section class="sec"><div class="dropzone card flat">' + svg("kamera") +
-      '<div style="text-align:center"><b>Noch kein Bild</b><p class="sm dim">Bis zu ' + ((bilder && bilder.maxCount) || 1) + " Bilder auf einmal.</p></div>" +
+      '<div style="text-align:center"><b>Noch kein Bild</b><p class="sm dim">Bis zu ' + maxBilder() + " Bilder auf einmal.</p></div>" +
       '<div class="btnrow" style="justify-content:center">' +
-      (bilder ? '<button class="btn" data-act="foto">' + svg("kamera") + 'Foto aufnehmen</button><button class="btn ghost" data-act="galerie">Aus Fotos wählen</button>' : "") +
+      '<button class="btn" data-act="foto">' + svg("kamera") + 'Foto aufnehmen</button><button class="btn ghost" data-act="galerie">Aus Fotos wählen</button>' +
       '<button class="btn ghost" data-act="textscan">' + svg("stift") + "Text abtippen</button></div>" +
-      (bilder ? '<p class="kbdhint">Auf dem iPad kommt die Auswahl von iOS. Tippe dort auf <b>Foto aufnehmen</b>, falls die Kamera nicht sofort aufgeht.</p>' : "") + "</div>" +
+      '<p class="kbdhint">Auf dem iPad kommt die Auswahl von iOS. Tippe dort auf <b>Foto aufnehmen</b>, falls die Kamera nicht sofort aufgeht.</p>' +
+      (nurOCR ? '<p class="kbdhint">Beim ersten Mal lädt das Sprachmodell etwa 10 MB. Danach liegt es im Browser und geht sofort.</p>' : "") + "</div>" +
       '<div class="card" style="padding:16px; margin-top:14px"><span class="lbl">So läuft es</span><div class="steps" style="margin-top:10px">' +
-      ["Foto machen oder Text einfügen.", "Fach, Datum und alle Themen werden erkannt.", "Du prüfst kurz und speicherst.", "Karteikarten und Quiz werden daraus gebaut, auf deinem Niveau."]
+      (SAMPLE ? ["Foto machen oder Text einfügen.", "Fach, Datum und alle Themen werden erkannt.", "Du prüfst kurz und speicherst.", "Karteikarten und Quiz werden daraus gebaut, auf deinem Niveau."]
+        : ["Foto vom Lernzielkatalog machen.", "Der Text wird auf deinem Gerät gelesen.", "Fach, Datum und die Zeilen werden zu Themen.", "Du prüfst kurz und speicherst."])
         .map((t, i) => '<div class="step"><span class="n">' + (i + 1) + '</span><span class="p">' + t + "</span></div>").join("") + "</div></div></section>";
     return s;
   }
   if (sc.phase === "bilder") return s + '<section class="sec"><div class="thumbs">' + sc.urls.map((u, i) =>
     '<figure><img src="' + u + '" alt="Aufnahme ' + (i + 1) + '"><button data-act="scanweg" data-id="' + i + '" aria-label="Entfernen">✕</button></figure>').join("") + "</div>" +
     '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="scanlesen">' + svg("funke") + "Erkennen</button>" +
-    (sc.urls.length < ((bilder && bilder.maxCount) || 1) ? '<button class="btn ghost" data-act="foto">Noch ein Foto</button>' : "") +
+    (sc.urls.length < maxBilder() ? '<button class="btn ghost" data-act="foto">Noch ein Foto</button>' : "") +
     '<button class="btn ghost" data-act="scanreset">Abbrechen</button></div></section>';
   if (sc.phase === "text") return s + '<section class="sec"><label class="f"><span>Lernziele oder Aufgaben als Text</span>' +
     '<textarea id="scantext" rows="9" placeholder="Klassenarbeit Mathe am 25.09.&#10;- Lineare Funktionen zeichnen&#10;- Steigung berechnen">' + esc(sc.text || "") + "</textarea></label>" +
     '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="textlesen">' + svg("funke") + "Erkennen</button>" +
     '<button class="btn ghost" data-act="scanreset">Abbrechen</button></div></section>';
   if (sc.phase === "laeuft") return s + '<section class="sec"><div class="card" style="padding:26px; text-align:center">' +
-    '<span class="row" style="justify-content:center"><span class="spin"></span><b>' + esc(sc.info || "Wird gelesen...") + "</b></span>" +
+    '<span class="row" style="justify-content:center"><span class="spin"></span><b id="ocrstatus">' + esc(sc.info || "Wird gelesen...") + "</b></span>" +
     '<p class="sm dim" style="margin-top:8px">Das dauert ein paar Sekunden.</p></div></section>';
   if (sc.phase === "fertig") {
     const e = sc.erg;
@@ -1495,6 +1500,122 @@ async function quizEnde() {
   if (pct < 50) merkeEinfacher();
   quiz = null;
 }
+/* ===================== Texterkennung auf dem Gerät ===================== */
+// Nur die Fassung auf dem eigenen Server bekommt diese Adresse mitgegeben.
+// Im Artifact ist sie leer, dort übernimmt Claude das Lesen.
+const OCR_URL = (typeof window !== "undefined" && window.SCHULPLANER_OCR) || "";
+let ocrWorker = null;
+const kannFoto = () => !!(SAMPLE && SAMPLE_LIMITS && SAMPLE_LIMITS.images) || !!OCR_URL;
+const maxBilder = () => (SAMPLE_LIMITS && SAMPLE_LIMITS.images && SAMPLE_LIMITS.images.maxCount) || 3;
+
+function ocrStatus(text) {
+  const el = document.getElementById("ocrstatus");
+  if (el) el.textContent = text;
+  else if (ui.scan && ui.scan.phase === "laeuft") { ui.scan.info = text; render(); }
+}
+async function ocrLaden() {
+  if (typeof Tesseract !== "undefined") return true;
+  if (!OCR_URL) return false;
+  await new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = OCR_URL;
+    s.onload = res;
+    s.onerror = () => rej(new Error("Die Texterkennung konnte nicht geladen werden. Bist du online?"));
+    document.head.appendChild(s);
+  });
+  return typeof Tesseract !== "undefined";
+}
+async function ocrText(blobs) {
+  if (!(await ocrLaden())) throw new Error("Texterkennung ist hier nicht verfügbar.");
+  if (!ocrWorker) {
+    ocrStatus("Sprachmodell wird geladen, beim ersten Mal dauert das etwas...");
+    ocrWorker = await Tesseract.createWorker("deu", 1, {
+      logger: m => {
+        const p = Math.round((m.progress || 0) * 100);
+        if (m.status === "recognizing text") ocrStatus("Text wird gelesen, " + p + "%");
+        else if (m.status && m.status.indexOf("load") === 0) ocrStatus("Sprachmodell wird geladen, " + p + "%");
+      }
+    });
+  }
+  let text = "";
+  for (let i = 0; i < blobs.length; i++) {
+    ocrStatus(blobs.length > 1 ? "Bild " + (i + 1) + " von " + blobs.length + " wird gelesen..." : "Text wird gelesen...");
+    const r = await ocrWorker.recognize(blobs[i]);
+    text += (r.data.text || "") + "\n";
+  }
+  return text;
+}
+
+const FACH_ALIAS = {
+  "mathematik": "Mathematik", "mathe": "Mathematik", "deutsch": "Deutsch",
+  "englisch": "Englisch", "english": "Englisch", "französisch": "Französisch", "franzoesisch": "Französisch",
+  "latein": "Latein", "spanisch": "Spanisch", "biologie": "Biologie", "bio": "Biologie",
+  "physik": "Physik", "chemie": "Chemie", "informatik": "Informatik",
+  "geschichte": "Geschichte", "erdkunde": "Erdkunde", "geographie": "Erdkunde", "geografie": "Erdkunde",
+  "politik": "Politik", "wirtschaft": "Wirtschaft", "religion": "Religion", "ethik": "Ethik",
+  "sport": "Sport", "kunst": "Kunst", "musik": "Musik", "technik": "Technik"
+};
+// Zeilen, die in fast jedem Lernzielkatalog als Überschrift stehen und selbst
+// kein Thema sind.
+const KEIN_THEMA = /^(lernziele?|themen|inhalte?|stoff|du kannst|ich kann|name|klasse|datum|fach|seite|viel erfolg|hinweise?)\s*:?\s*$/i;
+
+function textAuswerten(roh) {
+  const text = String(roh || "");
+  const zeilen = text.split(/\r?\n/)
+    .map(z => z.replace(/^[\s\-–—•*·o●□○>»]+/, "").replace(/^\d+[.)]\s+/, "").replace(/\s+/g, " ").trim())
+    .filter(z => z.length >= 4 && (z.match(/[A-Za-zÄÖÜäöüß]/g) || []).length >= 3);
+
+  // Datum: erstes Muster wie 25.09. oder 25.09.2026
+  let datum = "";
+  const m = text.match(/\b(\d{1,2})\s*\.\s*(\d{1,2})\s*\.\s*(\d{4}|\d{2})?/);
+  if (m) {
+    const tag = Number(m[1]), monat = Number(m[2]);
+    let jahr = m[3] ? Number(m[3].length === 2 ? "20" + m[3] : m[3]) : new Date().getFullYear();
+    if (tag >= 1 && tag <= 31 && monat >= 1 && monat <= 12) {
+      let iso = jahr + "-" + pad(monat) + "-" + pad(tag);
+      // Ohne Jahresangabe ist ein Datum, das lange zurückliegt, fast immer
+      // schon das nächste Jahr gemeint.
+      if (!m[3] && tageBis(iso) < -30) iso = (jahr + 1) + "-" + pad(monat) + "-" + pad(tag);
+      datum = iso;
+    }
+  }
+
+  // Fach über Stichwörter, längere Namen zuerst, damit "Mathematik" vor "Mathe" greift
+  let fach = "";
+  const klein = text.toLowerCase();
+  const schluessel = Object.keys(FACH_ALIAS).sort((a, b) => b.length - a.length);
+  for (const k of schluessel) if (klein.indexOf(k) >= 0) { fach = FACH_ALIAS[k]; break; }
+
+  // Titel: die Zeile, in der Arbeit, Test oder Klausur vorkommt
+  let titel = "", titelZeile = -1;
+  for (let i = 0; i < zeilen.length; i++) {
+    if (/klassenarbeit|klausur|\btest\b|prüfung|pruefung|arbeit\b/i.test(zeilen[i])) {
+      titel = zeilen[i].replace(/\s*\b(am|vom)\b.*$/i, "").replace(/[:\-–]\s*$/, "").trim();
+      titelZeile = i;
+      break;
+    }
+  }
+  if (!titel) titel = fach ? fach + "-Arbeit" : "Klassenarbeit";
+  if (titel.length > 70) titel = titel.slice(0, 70).trim();
+
+  const gesehen = {};
+  const themen = [];
+  for (let i = 0; i < zeilen.length; i++) {
+    if (i === titelZeile) continue;
+    const z = zeilen[i].replace(/[.;]+$/, "").trim();
+    if (!z || KEIN_THEMA.test(z)) continue;
+    // Reine Datums- oder Fachzeilen sind keine Themen.
+    if (/^\d[\d.\s\/]*$/.test(z)) continue;
+    if (z.length < 5 || z.length > 160) continue;
+    const key = z.toLowerCase();
+    if (gesehen[key]) continue;
+    gesehen[key] = true;
+    themen.push({ titel: z, stichpunkte: [] });
+    if (themen.length >= 20) break;
+  }
+  return { art: "test", fach: fach || "Allgemein", titel: titel, datum: datum, themen: themen };
+}
+
 /* ===================== Claude ===================== */
 function sampleFehler(e, retry) {
   const c = e && e.code;
@@ -1524,7 +1645,7 @@ async function bildVerkleinern(file) {
 async function bilderWaehlen(kamera, sofort) {
   const inp = document.createElement("input");
   inp.type = "file";
-  inp.accept = (SAMPLE_LIMITS && SAMPLE_LIMITS.images && SAMPLE_LIMITS.images.mediaTypes.join(",")) || "image/*";
+  inp.accept = (SAMPLE && SAMPLE_LIMITS && SAMPLE_LIMITS.images && SAMPLE_LIMITS.images.mediaTypes.join(",")) || "image/*";
   if (kamera) inp.setAttribute("capture", "environment"); else inp.multiple = true;
   // Safari auf dem iPad öffnet die Auswahl nur, wenn das Feld wirklich im Dokument steht.
   inp.style.cssText = "position:fixed; left:-9999px; top:0; width:1px; height:1px; opacity:0";
@@ -1534,7 +1655,7 @@ async function bilderWaehlen(kamera, sofort) {
   inp.onchange = async () => {
     const files = Array.from(inp.files || []);
     if (!files.length) { aufraeumen(); return; }
-    const maxN = (SAMPLE_LIMITS && SAMPLE_LIMITS.images && SAMPLE_LIMITS.images.maxCount) || 1;
+    const maxN = maxBilder();
     const sc = (ui.scan && ui.scan.phase === "bilder") ? ui.scan : { phase: "bilder", blobs: [], urls: [] };
     for (const f of files) {
       if (sc.blobs.length >= maxN) break;
@@ -1550,6 +1671,27 @@ async function bilderWaehlen(kamera, sofort) {
 async function scanLesen(bilder, text) {
   ui.scan = { phase: "laeuft", info: bilder ? "Das Bild wird gelesen..." : "Der Text wird gelesen..." };
   render();
+  if (!SAMPLE) {
+    // Ohne Claude: Text auf dem Gerät erkennen und nach Regeln zerlegen.
+    try {
+      const roh = bilder ? await ocrText(bilder) : text;
+      const erg = textAuswerten(roh);
+      if (!erg.themen.length) {
+        ui.scan = { phase: "text", text: String(roh || "").trim() };
+        render();
+        toast("Da war nichts Brauchbares. Sieh dir den Text an und pass ihn an.");
+        return;
+      }
+      ui.scan = { phase: "fertig", erg: erg, roh: String(roh || "").trim() };
+      render();
+    } catch (e) {
+      ui.scan = bilder ? { phase: "bilder", blobs: (ui.scan && ui.scan.blobs) || [], urls: (ui.scan && ui.scan.urls) || [] } : { phase: "text", text: text };
+      if (ui.scan.phase === "bilder" && !ui.scan.blobs.length) ui.scan = { phase: "leer" };
+      render();
+      toast((e && e.message) || "Die Texterkennung hat nicht geklappt.");
+    }
+    return;
+  }
   const p = "Du hilfst einem Schüler in Deutschland. " + lernkontext() + "\n" +
     (bilder ? "Auf den Bildern steht etwas aus der Schule: ein Lernzielkatalog, ein Arbeitsblatt, ein Tafelbild, eine Ankündigung oder eine Hausaufgabenliste. Lies alles, was du erkennen kannst."
       : "Hier ist ein Text aus der Schule:\n\n" + text) +
@@ -2013,8 +2155,7 @@ const A = {
   },
 
   fabscan: () => {
-    if (!SAMPLE) { sheetTest(null); return; }
-    if (!(SAMPLE_LIMITS && SAMPLE_LIMITS.images)) { ui.tab = "scan"; ui.scan = { phase: "text" }; render(); return; }
+    if (!kannFoto()) { if (SAMPLE) { ui.tab = "scan"; ui.scan = { phase: "text" }; render(); } else sheetTest(null); return; }
     ui.tab = "scan"; ui.scan = { phase: "leer" }; render();
     bilderWaehlen(true, true);
   },

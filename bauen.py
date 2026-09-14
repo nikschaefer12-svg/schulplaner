@@ -39,7 +39,14 @@ KOPF = """<!doctype html>
 
 # Das Kennzeichen muss vor dem Skript der Oberflaeche stehen, denn dort wird es
 # beim ersten Durchlauf gelesen.
-SCHALTER = '<script>window.SCHULPLANER_WEB = true;</script>\n'
+# Die Texterkennung wird erst beim ersten Scan nachgeladen, hier steht nur die
+# Adresse. Feste Versionsnummer mit Absicht: eine offene Angabe wuerde eines
+# Tages eine neue Fassung ziehen, die anders aufgerufen wird, und der Scan
+# waere kaputt, ohne dass sich hier etwas geaendert haette.
+OCR_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js"
+
+SCHALTER = ('<script>window.SCHULPLANER_WEB = true;'
+            ' window.SCHULPLANER_OCR = "' + OCR_URL + '";</script>\n')
 
 
 def bauen():
