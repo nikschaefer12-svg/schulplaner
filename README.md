@@ -146,13 +146,32 @@ macht dasselbe mit der Datenbank. Beides ist normal und kein Fehler.
 Seite in Safari öffnen, anmelden, Teilen-Knopf, **Zum Home-Bildschirm**.
 Danach startet sie ohne Adressleiste und mit eigenem Symbol.
 
+## Fotos lesen ohne Claude
+
+Die Seite kann Lernzielkataloge abfotografieren und auslesen. Dafür lädt sie
+beim ersten Scan `tesseract.js` nach und erkennt den Text im Browser selbst.
+Das Bild verlässt das Gerät nicht, und es kostet nichts.
+
+Beim ersten Mal kommen etwa 10 MB an Sprachmodell dazu (`deu.traineddata` und
+der wasm-Kern), danach liegen sie im Browser-Cache. Ein Scan dauert dann ein
+bis zwei Sekunden.
+
+`textAuswerten` in `oberflaeche.html` zerlegt den erkannten Text nach Regeln:
+Fach über Stichwörter, Datum über ein Muster wie `25.09.`, jede übrige Zeile
+wird ein Thema. Überschriften wie `Lernziele:` fallen raus. Kommt nichts
+Brauchbares heraus, landet der Rohtext im Textfeld statt in einer
+Fehlermeldung.
+
+Grenzen: gedruckter Text wird gut gelesen, Handschrift und Tafelbilder
+schlecht. Die Themen werden getrennt, aber nicht verstanden.
+
 ## Was hier nicht geht
 
-Lernziele aus einem Foto auslesen, Karteikarten und Quizfragen automatisch
-erzeugen, Erklärungen und Spickzettel. Das läuft über Claude und nur in der
-Artifact-Fassung. Ein API-Schlüssel dafür gehört nicht in eine Seite, die
-öffentlich erreichbar ist, denn er wäre von jedem auslesbar.
+Karteikarten und Quizfragen erzeugen, Erklärungen und Spickzettel. Das braucht
+ein Sprachmodell und läuft nur in der Artifact-Fassung über Claude. Ein
+API-Schlüssel dafür gehört nicht in eine Seite, die öffentlich erreichbar ist,
+denn er wäre von jedem auslesbar. In den Server-Einstellungen wäre er sicher,
+das wäre der Weg, falls das später doch dazukommen soll.
 
-Die Oberfläche merkt das von selbst und blendet die betroffenen Knöpfe aus,
-statt Fehler zu zeigen. Tests und Themen trägt man hier von Hand ein, alles
-Weitere rechnet der Planer wie gewohnt.
+Die Oberfläche merkt von selbst, was verfügbar ist, und blendet die übrigen
+Knöpfe aus, statt Fehler zu zeigen.
