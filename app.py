@@ -533,6 +533,25 @@ def redact(text):
     return re.sub(r"(postgres(?:ql)?://)[^@\s]+@", r"\1***@", str(text))
 
 
+def seiten_stand():
+    """Welche Fassung der Oberflaeche liegt gerade da.
+
+    Ohne das raet man beim Deployen: die Seite sieht gleich aus, egal ob der
+    neue Stand schon drauf ist. Groesse und Zeitstempel sagen es eindeutig,
+    und ob die Texterkennung eingebaut ist, steht direkt dabei.
+    """
+    pfad = os.path.join(app.template_folder, "index.html")
+    try:
+        roh = open(pfad, encoding="utf-8").read()
+        return {
+            "bytes": len(roh.encode("utf-8")),
+            "geaendert": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(os.path.getmtime(pfad))),
+            "texterkennung": "SCHULPLANER_OCR" in roh,
+        }
+    except OSError as exc:
+        return {"fehler": str(exc)}
+
+
 @app.get("/diag")
 def diag():
     info = {
@@ -540,6 +559,9 @@ def diag():
         "database_url_set": bool(DATABASE_URL),
         "schema_ready": _schema_ready,
         "secret_zufaellig": SECRET_ZUFAELLIG,
+        # Render legt den ausgelieferten Commit in diese Variable.
+        "commit": os.environ.get("RENDER_GIT_COMMIT", "")[:7],
+        "seite": seiten_stand(),
     }
     started = time.time()
     try:

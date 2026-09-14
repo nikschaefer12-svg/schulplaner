@@ -121,6 +121,22 @@ einen neuen, und alle sind nach jedem Neustart abgemeldet.
 Deployen, dann die Adresse öffnen, die Render vergibt. Die Tabellen entstehen
 bei der ersten Anfrage von selbst.
 
+### Neue Fassung einspielen
+
+Kommt Render ueber das Feld fuer oeffentliche Git-Adressen an das Repo, gibt es
+keine Verbindung zu GitHub und damit auch keine Benachrichtigung bei neuen
+Commits. Render merkt von selbst also nichts. Nach jedem `git push`:
+
+Render-Dashboard, der Dienst, oben rechts **Manual Deploy**, dann
+**Deploy latest commit**.
+
+Ob der neue Stand wirklich draussen ist, sagt `/diag`. Dort stehen der Commit
+und unter `seite` die Groesse, der Zeitstempel und ob die Texterkennung drin
+ist. Sieht die Seite unveraendert aus, ist das die erste Stelle zum Nachsehen.
+
+Wer das nicht jedes Mal von Hand machen will, verbindet in Render unter
+**Credentials** das GitHub-Konto, dem das Repo gehoert. Dann laeuft Auto-Deploy.
+
 **Kostenloser Plan:** Render fährt den Dienst nach etwa 15 Minuten ohne
 Zugriff herunter. Der erste Aufruf danach dauert dann eine halbe Minute. Neon
 macht dasselbe mit der Datenbank. Beides ist normal und kein Fehler.
