@@ -1,0 +1,2452 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Schulplaner: Hausaufgaben, Kalender, Stundenplan, Karteikarten, Noten und Zielnoten.">
+<meta name="theme-color" content="#1F3BA8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1218" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Schulplaner">
+<meta name="referrer" content="same-origin">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/static/icon-180.png">
+<link rel="icon" href="/static/icon-512.png" type="image/png">
+<style>
+  :root{color-scheme:light dark}
+  html,body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none !important}
+</style>
+<title>Schulplaner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --paper:#EDEFF4; --karo:#E1E5EE; --surface:#FFFFFF; --surface-2:#F4F6FB;
+  --ink:#141821; --ink-2:#4E5566; --ink-3:#838CA1;
+  --line:#DCE1EC; --line-2:#C4CBDB;
+  --tinte:#1F3BA8; --tinte-soft:#E4E9FA; --tinte-ink:#1F3BA8; --on-tinte:#FFFFFF;
+  --rot:#B93A2E; --rot-soft:#FAE5E2; --on-rot:#FFFFFF;
+  --gruen:#226A48; --gruen-soft:#DEF0E6;
+  --ocker:#9E640D; --ocker-soft:#F9EED8;
+  --chip-s:55%; --chip-bg-l:92%; --chip-fg-s:52%; --chip-fg-l:29%; --dot-l:45%;
+  --shadow:0 1px 2px rgba(20,24,33,.05), 0 10px 26px -16px rgba(20,24,33,.35);
+  --shadow-lift:0 2px 4px rgba(20,24,33,.06), 0 20px 44px -20px rgba(20,24,33,.42);
+  --r:14px;
+  --sans:"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --disp:"Archivo", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1218; --karo:#181C25; --surface:#181C25; --surface-2:#1F242F;
+    --ink:#E8EBF3; --ink-2:#A6AFC2; --ink-3:#7A8399;
+    --line:#282E3A; --line-2:#3A4252;
+    --tinte:#8BA1FF; --tinte-soft:#1C2340; --tinte-ink:#A9B9FF; --on-tinte:#0F1218;
+    --rot:#FF8B7E; --rot-soft:#341F1C; --on-rot:#241110;
+    --gruen:#69D09A; --gruen-soft:#12301F;
+    --ocker:#E3B15C; --ocker-soft:#2E2413;
+    --chip-s:38%; --chip-bg-l:20%; --chip-fg-s:68%; --chip-fg-l:74%; --dot-l:62%;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -16px rgba(0,0,0,.8);
+    --shadow-lift:0 2px 4px rgba(0,0,0,.45), 0 20px 44px -20px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1218; --karo:#181C25; --surface:#181C25; --surface-2:#1F242F;
+  --ink:#E8EBF3; --ink-2:#A6AFC2; --ink-3:#7A8399;
+  --line:#282E3A; --line-2:#3A4252;
+  --tinte:#8BA1FF; --tinte-soft:#1C2340; --tinte-ink:#A9B9FF; --on-tinte:#0F1218;
+  --rot:#FF8B7E; --rot-soft:#341F1C; --on-rot:#241110;
+  --gruen:#69D09A; --gruen-soft:#12301F;
+  --ocker:#E3B15C; --ocker-soft:#2E2413;
+  --chip-s:38%; --chip-bg-l:20%; --chip-fg-s:68%; --chip-fg-l:74%; --dot-l:62%;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -16px rgba(0,0,0,.8);
+  --shadow-lift:0 2px 4px rgba(0,0,0,.45), 0 20px 44px -20px rgba(0,0,0,.9);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.5;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--karo) 1px, transparent 1px), linear-gradient(90deg, var(--karo) 1px, transparent 1px);
+  background-size:26px 26px; background-position:-1px -1px;
+  -webkit-tap-highlight-color:transparent;
+}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0; text-align:left}
+:focus-visible{outline:2.5px solid var(--tinte); outline-offset:2px; border-radius:6px}
+h1,h2,h3{margin:0; font-family:var(--disp); font-weight:700; letter-spacing:-.015em; text-wrap:balance}
+p{margin:0}
+ul,ol{margin:0; padding:0; list-style:none}
+
+.shell{display:flex; flex-direction:column-reverse; justify-content:flex-end; min-height:100dvh}
+.main{flex:1; display:flex; flex-direction:column; min-width:0}
+.top{
+  position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:10px;
+  padding:10px 16px; padding-top:max(10px, env(safe-area-inset-top));
+  background:color-mix(in srgb, var(--paper) 86%, transparent); backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.wordmark{display:flex; align-items:baseline; gap:9px; min-width:0}
+.wordmark b{font-family:var(--disp); font-size:1.06rem; font-weight:700; letter-spacing:-.025em}
+.wordmark span{font-family:var(--mono); font-size:.71rem; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.sp{flex:1}
+.iconbtn{
+  width:40px; height:40px; display:grid; place-items:center; border-radius:11px; flex:0 0 auto;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink-2); position:relative;
+}
+.iconbtn:active{transform:scale(.95)}
+.iconbtn svg{width:20px; height:20px; stroke-width:1.8}
+.badge{
+  position:absolute; top:-6px; right:-6px; min-width:19px; height:19px; padding:0 5px; border-radius:10px;
+  background:var(--rot); color:var(--on-rot); font-size:.67rem; font-weight:600; display:grid; place-items:center;
+  font-family:var(--mono); border:2px solid var(--paper);
+}
+#view{padding:18px 16px 104px; max-width:880px; width:100%; margin:0 auto; flex:1}
+
+.tabs{
+  position:sticky; bottom:0; z-index:30; display:flex; gap:2px; justify-content:space-around;
+  background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(14px);
+  border-top:1px solid var(--line); padding:6px 6px max(6px, env(safe-area-inset-bottom));
+}
+.tab{
+  flex:1; min-height:52px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  border-radius:12px; color:var(--ink-3); font-size:.68rem; font-weight:500; position:relative; text-align:center;
+}
+.tab svg{width:23px; height:23px; stroke-width:1.7}
+.tab[aria-current="page"]{color:var(--tinte-ink); background:var(--tinte-soft)}
+.tab .cnt{
+  position:absolute; top:3px; right:calc(50% - 24px); min-width:17px; height:17px; padding:0 4px;
+  background:var(--rot); color:var(--on-rot); border-radius:9px; font-family:var(--mono);
+  font-size:.62rem; font-weight:600; display:grid; place-items:center;
+}
+@media (min-width:900px){
+  .shell{flex-direction:row}
+  .tabs{
+    flex-direction:column; justify-content:flex-start; gap:4px; width:230px; flex:0 0 230px;
+    height:100dvh; position:sticky; top:0; bottom:auto; border-top:0; border-right:1px solid var(--line);
+    padding:20px 12px; background:color-mix(in srgb, var(--surface) 78%, transparent);
+  }
+  .tabs::before{
+    content:"Schulplaner"; font-family:var(--disp); font-weight:700; font-size:1.15rem; letter-spacing:-.02em;
+    padding:0 14px 16px; color:var(--ink);
+  }
+  .tab{flex:0 0 auto; flex-direction:row; justify-content:flex-start; gap:12px; padding:0 14px; min-height:46px; font-size:.95rem}
+  .tab .cnt{position:static; margin-left:auto}
+  .wordmark{display:none}
+  #view{padding:26px 34px 110px}
+  .top{padding-left:34px; padding-right:34px}
+}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow)}
+.flat{box-shadow:none}
+.stack{display:flex; flex-direction:column; gap:14px}
+.stack-s{display:flex; flex-direction:column; gap:8px}
+.sec{display:flex; flex-direction:column; gap:10px; margin-top:26px}
+.sec:first-child{margin-top:0}
+.sec > header{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.sec > header h2{font-size:1.02rem}
+.lbl{font-size:.69rem; text-transform:uppercase; letter-spacing:.09em; font-weight:600; color:var(--ink-3)}
+.muted{color:var(--ink-2)}
+.dim{color:var(--ink-3)}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.sm{font-size:.86rem}
+.row{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.empty{padding:24px 20px; text-align:center; color:var(--ink-3); font-size:.92rem; border:1px dashed var(--line-2); border-radius:var(--r)}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:0 18px;
+  border-radius:12px; background:var(--tinte); color:var(--on-tinte); font-weight:600; font-size:.94rem;
+  border:1px solid transparent; text-align:center;
+}
+.btn:active{transform:scale(.985)}
+.btn[disabled]{opacity:.42; pointer-events:none}
+.btn.ghost{background:var(--surface); color:var(--ink); border-color:var(--line-2)}
+.btn.soft{background:var(--tinte-soft); color:var(--tinte-ink)}
+.btn.danger{background:var(--rot-soft); color:var(--rot)}
+.btn.small{min-height:38px; padding:0 13px; font-size:.85rem; border-radius:10px}
+.btn.wide{width:100%}
+.btn svg{width:19px; height:19px; stroke-width:1.9; flex:0 0 auto}
+.btnrow{display:flex; flex-wrap:wrap; gap:9px}
+input[type=text],input[type=date],input[type=time],input[type=number],input[type=password],select,textarea{
+  width:100%; min-height:46px; padding:10px 13px; border-radius:11px; border:1px solid var(--line-2);
+  background:var(--surface); font-size:16px; font-family:inherit;
+}
+textarea{min-height:96px; resize:vertical; line-height:1.5}
+label.f{display:flex; flex-direction:column; gap:6px}
+label.f > span{font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; font-weight:600; color:var(--ink-3)}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.chip{
+  display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:7px; font-size:.76rem;
+  font-weight:600; white-space:nowrap;
+  background:hsl(var(--h,214) var(--chip-s) var(--chip-bg-l)); color:hsl(var(--h,214) var(--chip-fg-s) var(--chip-fg-l));
+}
+.dot{width:7px; height:7px; border-radius:50%; background:hsl(var(--h,214) 62% var(--dot-l)); flex:0 0 auto}
+.pill{display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border-radius:999px; font-size:.74rem; font-weight:600; white-space:nowrap}
+.pill.rot{background:var(--rot-soft); color:var(--rot)}
+.pill.gruen{background:var(--gruen-soft); color:var(--gruen)}
+.pill.ocker{background:var(--ocker-soft); color:var(--ocker)}
+.pill.tinte{background:var(--tinte-soft); color:var(--tinte-ink)}
+.pill.grau{background:var(--surface-2); color:var(--ink-3)}
+
+.hero{padding:20px 18px; display:flex; flex-direction:column; gap:4px}
+.hero .tag{font-family:var(--mono); font-size:.75rem; color:var(--ink-3); text-transform:uppercase; letter-spacing:.08em}
+.hero h1{font-size:clamp(1.5rem,4.6vw,2rem); line-height:1.12}
+.hero .sub{color:var(--ink-2); font-size:.94rem; margin-top:4px}
+.nudge{
+  display:flex; gap:13px; align-items:flex-start; padding:15px 16px; border-radius:var(--r); width:100%;
+  background:var(--tinte-soft); border:1px solid color-mix(in srgb, var(--tinte) 22%, transparent); text-align:left;
+}
+.nudge.warn{background:var(--ocker-soft); border-color:color-mix(in srgb, var(--ocker) 30%, transparent)}
+.nudge.alarm{background:var(--rot-soft); border-color:color-mix(in srgb, var(--rot) 30%, transparent)}
+.nudge.still{background:var(--surface); border-color:var(--line)}
+.nudge > svg{width:22px; height:22px; flex:0 0 auto; margin-top:1px; stroke-width:1.8}
+.nudge .tx{min-width:0; flex:1}
+.nudge b{display:block; font-family:var(--disp); font-size:.97rem}
+.nudge .p{font-size:.87rem; color:var(--ink-2); margin-top:2px; overflow-wrap:anywhere}
+
+.item{display:flex; align-items:flex-start; gap:12px; padding:13px 14px; width:100%; background:none}
+.list{display:flex; flex-direction:column; overflow:hidden}
+.list > * + *{border-top:1px solid var(--line)}
+.check{
+  width:27px; height:27px; border-radius:9px; border:2px solid var(--line-2); flex:0 0 auto; margin-top:1px;
+  display:grid; place-items:center; color:transparent; background:var(--surface);
+}
+.check svg{width:16px; height:16px; stroke-width:3}
+.item.done .check{background:var(--gruen); border-color:var(--gruen); color:var(--surface)}
+.item.done .t{text-decoration:line-through; color:var(--ink-3)}
+.item .body{flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; text-align:left}
+.item .t{font-weight:500; line-height:1.35; overflow-wrap:anywhere}
+.item .meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.item .note{font-size:.85rem; color:var(--ink-2); overflow-wrap:anywhere}
+.daygroup{display:flex; flex-direction:column; gap:8px}
+.daygroup > .head{display:flex; align-items:baseline; gap:9px; padding:0 3px}
+.daygroup > .head .d{font-family:var(--disp); font-weight:600; font-size:.92rem}
+.daygroup > .head .n{font-family:var(--mono); font-size:.76rem; color:var(--ink-3)}
+.filters{display:flex; gap:7px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filters button{
+  padding:7px 13px; border-radius:999px; border:1px solid var(--line-2); background:var(--surface);
+  font-size:.85rem; font-weight:500; color:var(--ink-2); white-space:nowrap; min-height:38px;
+}
+.filters button[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.quick{display:flex; gap:8px; align-items:stretch}
+.quick input{flex:1}
+.quick .btn{padding:0 14px}
+
+.calhead{display:flex; align-items:center; gap:8px}
+.calhead h2{flex:1; font-size:1.1rem}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:3px; padding:10px}
+.cal .wd{text-align:center; font-size:.68rem; font-weight:600; color:var(--ink-3); text-transform:uppercase; letter-spacing:.06em; padding-bottom:4px}
+.cal .day{
+  aspect-ratio:1/1; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; font-family:var(--mono); font-size:.88rem; color:var(--ink); border:1px solid transparent; min-height:40px;
+}
+.cal .day.out{color:var(--ink-3); opacity:.5}
+.cal .day.today{border-color:var(--tinte); color:var(--tinte-ink); font-weight:600}
+.cal .day[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.cal .day .dots{display:flex; gap:2.5px; height:7px; align-items:center}
+.cal .day .dots .dot{width:5.5px; height:5.5px}
+.cal .day .ex{width:5.5px; height:5.5px; border-radius:50%; background:var(--rot)}
+.wcol{display:flex; flex-direction:column; gap:6px}
+.wcol > .hd{display:flex; align-items:baseline; gap:8px; padding:0 2px}
+.wcol > .hd b{font-family:var(--disp); font-size:.95rem}
+.wcol > .hd.jetzt b{color:var(--tinte-ink)}
+
+.testcard{padding:16px; display:flex; flex-direction:column; gap:12px; width:100%; background:var(--surface); text-align:left}
+.testcard .l1{display:flex; align-items:flex-start; gap:10px}
+.testcard .l1 .body{flex:1; min-width:0}
+.testcard h3{font-size:1.06rem; line-height:1.25}
+.testcard .when{text-align:right; flex:0 0 auto}
+.testcard .when .num{font-family:var(--disp); font-size:1.5rem; font-weight:700; line-height:1; letter-spacing:-.03em; display:block}
+.testcard .when .unit{font-family:var(--mono); font-size:.66rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-3)}
+.testcard.soon .when .num{color:var(--rot)}
+.bar{height:7px; border-radius:4px; background:var(--surface-2); overflow:hidden; border:1px solid var(--line)}
+.bar i{display:block; height:100%; background:var(--tinte); border-radius:4px}
+.bar.gruen i{background:var(--gruen)}
+.bar.ocker i{background:var(--ocker)}
+.bar.rot i{background:var(--rot)}
+.barrow{display:flex; align-items:center; gap:10px}
+.barrow .bar{flex:1}
+.barrow .pct{font-family:var(--mono); font-size:.76rem; color:var(--ink-3); min-width:38px; text-align:right}
+
+.sheet{position:fixed; inset:0; z-index:60; display:flex; align-items:flex-end; justify-content:center; background:rgba(10,13,20,.42); backdrop-filter:blur(3px)}
+.sheet[hidden]{display:none}
+.sheet > .panel{
+  background:var(--paper); width:100%; max-width:640px; max-height:92dvh; display:flex; flex-direction:column;
+  border-radius:20px 20px 0 0; box-shadow:var(--shadow-lift); border:1px solid var(--line); border-bottom:0;
+  animation:up .22s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes up{from{transform:translateY(18px); opacity:.6}}
+@media (prefers-reduced-motion:reduce){.sheet > .panel{animation:none}}
+@media (min-width:700px){
+  .sheet{align-items:center; padding:24px}
+  .sheet > .panel{border-radius:18px; border-bottom:1px solid var(--line); max-height:86dvh}
+}
+.panel > header{display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--paper); border-radius:20px 20px 0 0; z-index:2}
+.panel > header h2{flex:1; font-size:1.05rem; min-width:0}
+.panel > .body{padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; -webkit-overflow-scrolling:touch}
+.panel > footer{padding:12px 16px max(12px, env(safe-area-inset-bottom)); border-top:1px solid var(--line); display:flex; gap:9px}
+.panel > footer .btn{flex:1}
+
+.flash{min-height:260px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:28px 22px; text-align:center; background:var(--surface); border-radius:var(--r); border:1px solid var(--line); box-shadow:var(--shadow); width:100%}
+.flash .q{font-family:var(--disp); font-size:1.25rem; line-height:1.3; font-weight:600}
+.flash .a{font-size:1rem; color:var(--ink-2); line-height:1.55; border-top:1px dashed var(--line-2); padding-top:14px; width:100%}
+.flash .hint{font-size:.8rem; color:var(--ink-3)}
+.progressdots{display:flex; gap:4px; justify-content:center; flex-wrap:wrap}
+.progressdots i{width:7px; height:7px; border-radius:50%; background:var(--line-2)}
+.progressdots i.on{background:var(--tinte)}
+.progressdots i.now{background:var(--ink); transform:scale(1.35)}
+
+.qopt{display:flex; gap:11px; align-items:flex-start; padding:13px 14px; border-radius:12px; width:100%; border:1px solid var(--line-2); background:var(--surface); font-size:.95rem; line-height:1.4; text-align:left}
+.qopt .k{width:25px; height:25px; border-radius:7px; background:var(--surface-2); color:var(--ink-2); flex:0 0 auto; display:grid; place-items:center; font-family:var(--mono); font-size:.8rem; font-weight:600}
+.qopt.right{border-color:var(--gruen); background:var(--gruen-soft)}
+.qopt.right .k{background:var(--gruen); color:var(--surface)}
+.qopt.wrong{border-color:var(--rot); background:var(--rot-soft)}
+.qopt.wrong .k{background:var(--rot); color:var(--on-rot)}
+.qopt[disabled]{pointer-events:none; opacity:1}
+.score{font-family:var(--disp); font-size:3rem; font-weight:700; line-height:1; letter-spacing:-.04em}
+
+.dropzone{border:1.5px dashed var(--line-2); border-radius:var(--r); padding:26px 20px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px}
+.dropzone > svg{width:34px; height:34px; stroke-width:1.4; color:var(--ink-3)}
+.thumbs{display:flex; gap:8px; flex-wrap:wrap}
+.thumbs figure{margin:0; position:relative; width:78px; height:78px; border-radius:10px; overflow:hidden; border:1px solid var(--line-2)}
+.thumbs img{width:100%; height:100%; object-fit:cover; display:block}
+.thumbs button{position:absolute; top:3px; right:3px; width:22px; height:22px; border-radius:50%; background:rgba(10,13,20,.72); color:#fff; display:grid; place-items:center; font-size:.8rem; line-height:1; text-align:center}
+.steps{display:flex; flex-direction:column; gap:9px}
+.step{display:flex; gap:11px; align-items:flex-start}
+.step .n{width:23px; height:23px; border-radius:50%; background:var(--tinte-soft); color:var(--tinte-ink); flex:0 0 auto; display:grid; place-items:center; font-family:var(--mono); font-size:.75rem; font-weight:600}
+.step .p{font-size:.9rem; color:var(--ink-2)}
+.spin{width:17px; height:17px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:sp .7s linear infinite; display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2s}}
+.aitext{font-size:.97rem; line-height:1.62; white-space:pre-wrap; overflow-wrap:anywhere}
+
+.slot{display:flex; align-items:center; gap:11px; padding:11px 14px}
+.slot .time{font-family:var(--mono); font-size:.83rem; color:var(--ink-3); min-width:42px; font-variant-numeric:tabular-nums}
+.slot .rule{width:3px; align-self:stretch; border-radius:2px; background:hsl(var(--h,214) 60% var(--dot-l))}
+
+#toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(84px + env(safe-area-inset-bottom)); z-index:90; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; width:max-content; max-width:90vw}
+#toast div{background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:11px; font-size:.88rem; box-shadow:var(--shadow-lift); animation:up .2s ease}
+@media (min-width:900px){#toast{bottom:24px}}
+.kbdhint{font-size:.78rem; color:var(--ink-3); text-align:center}
+.split{display:flex; gap:10px; align-items:center}
+.split > *{flex:1}
+.tick{display:flex; align-items:center; gap:12px; padding:12px 14px; width:100%; text-align:left}
+.tick .sw{width:44px; height:26px; border-radius:999px; background:var(--line-2); position:relative; flex:0 0 auto; transition:background .15s}
+.tick .sw::after{content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:var(--surface); transition:transform .15s}
+.tick[aria-pressed="true"] .sw{background:var(--tinte)}
+.tick[aria-pressed="true"] .sw::after{transform:translateX(18px)}
+
+/* Anmeldung, Profil, Niveau */
+.gate{min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px 18px calc(24px + env(safe-area-inset-bottom))}
+.gate > .box{width:100%; max-width:470px; display:flex; flex-direction:column; gap:18px}
+.gate .mark{font-family:var(--disp); font-weight:700; font-size:2.1rem; letter-spacing:-.035em; line-height:1}
+.gate .claim{color:var(--ink-2); font-size:.95rem; margin-top:5px}
+.avatar{
+  width:46px; height:46px; border-radius:14px; display:grid; place-items:center; flex:0 0 auto;
+  font-family:var(--disp); font-weight:700; font-size:1.1rem; letter-spacing:-.02em;
+  background:hsl(var(--h,214) var(--chip-s) var(--chip-bg-l)); color:hsl(var(--h,214) var(--chip-fg-s) var(--chip-fg-l));
+}
+.avatar.big{width:66px; height:66px; border-radius:20px; font-size:1.6rem}
+.avatar.mini{width:30px; height:30px; border-radius:9px; font-size:.8rem}
+.who{display:flex; align-items:center; gap:13px; padding:13px 14px; width:100%; text-align:left}
+.who .n{font-family:var(--disp); font-weight:600; font-size:1.02rem}
+.who .k{font-size:.83rem; color:var(--ink-3)}
+.optgrid{display:flex; flex-wrap:wrap; gap:7px}
+.optgrid button{
+  min-height:44px; min-width:46px; padding:0 14px; border-radius:11px; border:1px solid var(--line-2);
+  background:var(--surface); font-size:.92rem; font-weight:500; color:var(--ink-2); text-align:center;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.optgrid button[aria-pressed="true"]{background:var(--tinte); border-color:var(--tinte); color:var(--on-tinte); font-weight:600}
+.seg{display:flex; gap:3px; padding:3px; border-radius:12px; background:var(--surface-2); border:1px solid var(--line)}
+.seg button{flex:1; min-height:38px; border-radius:9px; text-align:center; font-size:.87rem; font-weight:500; color:var(--ink-2); display:inline-flex; align-items:center; justify-content:center; gap:6px}
+.seg button[aria-pressed="true"]{background:var(--surface); color:var(--ink); font-weight:600; box-shadow:var(--shadow)}
+.dots4{display:flex; gap:11px; justify-content:center; margin:6px 0}
+.dots4 i{width:14px; height:14px; border-radius:50%; border:2px solid var(--line-2)}
+.dots4 i.on{background:var(--ink); border-color:var(--ink)}
+.pinpad{display:grid; grid-template-columns:repeat(3,1fr); gap:9px}
+.pinpad button{min-height:58px; border-radius:13px; background:var(--surface); border:1px solid var(--line-2); font-family:var(--mono); font-size:1.25rem; font-weight:500; display:grid; place-items:center; text-align:center}
+.pinpad button:active{background:var(--surface-2)}
+.stufe{display:inline-flex; align-items:center; gap:6px; font-size:.74rem; font-weight:600; color:var(--ink-3)}
+.stufe .seg3{display:flex; gap:2px}
+.stufe .seg3 i{width:13px; height:5px; border-radius:3px; background:var(--line-2)}
+.stufe .seg3 i.on{background:var(--tinte)}
+.stufe.gut .seg3 i.on{background:var(--gruen)}
+.stufe.mittel .seg3 i.on{background:var(--ocker)}
+.stufe.schwach .seg3 i.on{background:var(--rot)}
+.themacard{padding:12px 13px; display:flex; flex-direction:column; gap:8px}
+.themacard .top2{display:flex; align-items:flex-start; gap:10px}
+.themacard .top2 b{flex:1; font-weight:600; font-size:.95rem; line-height:1.35}
+.hilfe{background:var(--surface-2); border-radius:11px; padding:11px 13px; font-size:.87rem; color:var(--ink-2); border:1px solid var(--line)}
+
+/* Knöpfe unten rechts */
+.fab{position:fixed; right:16px; bottom:calc(74px + env(safe-area-inset-bottom)); z-index:40; display:flex; gap:10px; align-items:flex-end}
+@media (min-width:900px){.fab{bottom:26px; right:28px}}
+.fab .fb{display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:56px; padding:0 20px; border-radius:18px; font-weight:600; font-size:.97rem; box-shadow:var(--shadow-lift)}
+.fab .fb.prim{background:var(--tinte); color:var(--on-tinte)}
+.fab .fb.alt{background:var(--surface); color:var(--ink); border:1px solid var(--line-2)}
+.fab .fb svg{width:22px; height:22px; stroke-width:1.9; flex:0 0 auto}
+.fab .fb:active{transform:scale(.97)}
+@media (max-width:560px){.fab .fb.alt span{display:none} .fab .fb.alt{padding:0 17px}}
+
+/* Lernstreifen */
+.streifen{display:flex; gap:3px; align-items:flex-end}
+.streifen i{flex:1; height:26px; border-radius:4px; background:var(--surface-2); border:1px solid var(--line)}
+.streifen i.an{background:var(--tinte); border-color:var(--tinte)}
+.streifen i.heute{outline:2px solid var(--ink); outline-offset:1px}
+.fragebox{display:flex; gap:8px; align-items:stretch}
+.fragebox input{flex:1}
+.notegross{font-family:var(--disp); font-weight:700; font-size:1.45rem; letter-spacing:-.02em; line-height:1}
+.zeile{display:flex; align-items:center; gap:11px; padding:12px 14px; width:100%; text-align:left}
+.zeile .nm{flex:1; min-width:0; font-weight:500}
+.aufwandbox{display:flex; flex-direction:column; gap:9px; padding:14px; border-radius:var(--r); border:1px solid var(--line); background:var(--surface-2)}
+.aufwandbox .kopf{display:flex; align-items:center; gap:9px}
+.aufwandbox .min{font-family:var(--disp); font-weight:700; font-size:1.35rem; letter-spacing:-.02em}
+.notengrid{display:flex; flex-wrap:wrap; gap:7px}
+.notengrid button{min-height:48px; min-width:56px; padding:0 12px; border-radius:12px; border:1px solid var(--line-2); background:var(--surface); font-family:var(--mono); font-size:1rem; font-weight:500; display:inline-flex; align-items:center; justify-content:center}
+.notengrid button[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+</style>
+</head>
+<body>
+<script>window.SCHULPLANER_WEB = true;</script>
+
+
+<div id="gate" class="gate" hidden></div>
+<div class="shell" id="shell" hidden>
+  <nav class="tabs" id="tabs" aria-label="Bereiche"></nav>
+  <div class="main">
+    <header class="top">
+      <div class="wordmark"><b>Schulplaner</b><span id="topdate"></span></div>
+      <div class="sp"></div>
+      <button class="iconbtn" data-act="nudges" aria-label="Erinnerungen" id="bellbtn"></button>
+      <button class="iconbtn" data-act="settings" aria-label="Profil und Einstellungen" id="profbtn"></button>
+    </header>
+    <main id="view"></main>
+  </div>
+  <div class="fab" id="fab"></div>
+</div>
+<div class="sheet" id="sheet" hidden></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ===================== Grundlagen ===================== */
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = n => String(n).padStart(2, "0");
+const WD = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+const WDK = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+const MON = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+const toISO = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const fromISO = s => { const p = String(s || "").split("-").map(Number); return new Date(p[0], (p[1] || 1) - 1, p[2] || 1); };
+const heute = () => toISO(new Date());
+const plusTage = (iso, n) => { const d = fromISO(iso); d.setDate(d.getDate() + n); return toISO(d); };
+const tageBis = iso => Math.round((fromISO(iso) - fromISO(heute())) / 86400000);
+function relTag(iso) {
+  const n = tageBis(iso);
+  if (n === 0) return "heute";
+  if (n === 1) return "morgen";
+  if (n === 2) return "übermorgen";
+  if (n === -1) return "gestern";
+  if (n < 0) return "vor " + (-n) + " Tagen";
+  if (n < 7) return WD[fromISO(iso).getDay()];
+  return "in " + n + " Tagen";
+}
+const datumLang = iso => { const d = fromISO(iso); return WD[d.getDay()] + ", " + d.getDate() + ". " + MON[d.getMonth()]; };
+const datumKurz = iso => { const d = fromISO(iso); return WDK[d.getDay()] + " " + d.getDate() + "." + (d.getMonth() + 1) + "."; };
+const initialen = n => String(n || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "?";
+const profZeichen = p => (p && (p.kontoName || p.name)) ? initialen(p.kontoName || p.name) : String((p && p.klasse) || "?");
+const profName = p => (p && (p.kontoName || p.name)) ? (p.kontoName || p.name) : "Klasse " + ((p && p.klasse) || "?");
+function toast(msg) {
+  const t = document.createElement("div"); t.textContent = msg; $("#toast").append(t);
+  setTimeout(() => { t.style.opacity = "0"; t.style.transition = "opacity .3s"; setTimeout(() => t.remove(), 320); }, 2600);
+}
+const ICON = {
+  heute: '<path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/>',
+  aufgaben: '<path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/>',
+  kalender: '<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 10h18M8 2v4M16 2v4"/>',
+  lernen: '<path d="M12 7 3 4.6 3 18l9 2.4L21 18V4.6L12 7z"/><path d="M12 7v13.4"/>',
+  scan: '<path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><circle cx="12" cy="12" r="3.4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', check: '<path d="M4 12.5 9.5 18 20 6.5"/>',
+  zurueck: '<path d="M15 5l-7 7 7 7"/>', x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  glocke: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+  funke: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>',
+  kamera: '<path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="4"/>',
+  karte: '<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 9h6M6 13h4"/>',
+  quiz: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 1 1 3.4 2.5c-.6.2-.9.8-.9 1.5"/><path d="M12 17h.01"/>',
+  uhr: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  muell: '<path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/>',
+  stift: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/>',
+  download: '<path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+  person: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
+  schloss: '<rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  raus: '<path d="M14 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l-5-5 5-5M5 12h10"/>',
+  sonne: '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+  hoch: '<path d="M12 19V5M5 12l7-7 7 7"/>',
+  leicht: '<path d="M12 2.5 14.9 9l7 .6-5.3 4.6 1.6 6.9L12 17.4 5.8 21.1l1.6-6.9L2.1 9.6 9.1 9z"/>',
+  buch: '<path d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4z"/><path d="M20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20z"/>'
+};
+const svg = (n, cls) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"' + (cls ? ' class="' + cls + '"' : "") + ">" + (ICON[n] || "") + "</svg>";
+
+/* ===================== Stammdaten ===================== */
+const FACH_HUE = {
+  "Mathematik": 214, "Deutsch": 352, "Englisch": 26, "Französisch": 330, "Latein": 96, "Spanisch": 12,
+  "Biologie": 146, "Physik": 264, "Chemie": 186, "Informatik": 200, "Naturwissenschaften": 170,
+  "Geschichte": 40, "Erdkunde": 168, "Politik": 20, "Wirtschaft": 48, "Religion": 250, "Ethik": 250,
+  "Sport": 6, "Kunst": 318, "Musik": 288, "Technik": 210, "Hauswirtschaft": 130
+};
+const SCHULFORMEN = ["Gymnasium", "Realschule", "Gesamtschule", "Hauptschule", "Sekundarschule", "Mittelschule", "Oberschule", "Berufskolleg", "Berufsschule", "Waldorfschule", "Andere"];
+const LAENDER = ["Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen", "Österreich", "Schweiz"];
+const KLASSEN = ["5", "6", "7", "8", "9", "10", "11", "12", "13"];
+const BOX_TAGE = [0, 1, 3, 7, 16, 35];
+
+let state = {
+  ha: [], tests: [], faecher: [], plan: [],
+  cfg: { seeded: false, streak: [], letzterCheck: "", erklaerstufe: "auto", theme: "system", einfachZaehler: 0 }
+};
+let profile = [];      // {id, name, klasse, schulform, land, h, pin}
+let profil = null;     // aktives Profil
+let ui = { tab: "heute", filter: "offen", calM: null, calSel: heute(), calAnsicht: "monat", scan: null, setup: null, pin: null };
+let DB = null, SAMPLE = null, SAMPLE_LIMITS = null, DL = null;
+let unsubs = [], dbBereit = false;
+// Läuft die Seite auf dem eigenen Server, setzt die Vorlage dieses Kennzeichen.
+// Dann kommen die Daten über die API statt aus dem Claude-Speicher.
+const WEB = (typeof window !== "undefined" && window.SCHULPLANER_WEB === true);
+let SRV = null;
+
+const LS_PROF = "karo.v3.profile", LS_AKTIV = "karo.v3.aktiv";
+const lsDaten = pid => "karo.v3.d." + pid;
+function saveLocal() { if (profil) try { localStorage.setItem(lsDaten(profil.id), JSON.stringify(state)); } catch (e) { } }
+function saveProfileLocal() { try { localStorage.setItem(LS_PROF, JSON.stringify(profile)); } catch (e) { } }
+function ladeDaten(pid) {
+  state = { ha: [], tests: [], faecher: [], plan: [], cfg: { seeded: false, streak: [], letzterCheck: "", erklaerstufe: "auto", theme: "system", einfachZaehler: 0 } };
+  try {
+    const raw = localStorage.getItem(lsDaten(pid));
+    if (raw) { const o = JSON.parse(raw); for (const k in state) if (o[k] != null) state[k] = Object.assign(state[k], o[k]); }
+  } catch (e) { }
+}
+function themaSetzen() {
+  const t = (state.cfg && state.cfg.theme) || "system";
+  if (t === "system") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", t);
+}
+const hueVon = f => { const e = state.faecher.find(x => x.name === f); return e ? e.h : (FACH_HUE[f] != null ? FACH_HUE[f] : 214); };
+function fachSichern(name) {
+  if (!name || state.faecher.some(f => f.name === name)) return;
+  state.faecher.push({ name: name, h: FACH_HUE[name] != null ? FACH_HUE[name] : Math.floor(Math.random() * 36) * 10 });
+  putApp("faecher");
+}
+
+/* ===================== Speichern ===================== */
+const P = () => "p/" + profil.id;
+async function put(coll, obj) {
+  const key = coll === "hausaufgaben" ? "ha" : "tests";
+  const i = state[key].findIndex(x => x.id === obj.id);
+  if (i >= 0) state[key][i] = obj; else state[key].unshift(obj);
+  saveLocal(); render();
+  if (SRV) { try { await api(srvPfad(coll) + obj.id, "PUT", obj); } catch (e) { srvFehler(e); } return; }
+  if (DB) { try { await DB.doc(P() + "/" + coll + "/" + obj.id).set(obj); } catch (e) { dbFehler(e); } }
+}
+async function del(coll, id) {
+  const key = coll === "hausaufgaben" ? "ha" : "tests";
+  state[key] = state[key].filter(x => x.id !== id);
+  saveLocal(); render();
+  if (SRV) { try { await api(srvPfad(coll) + id, "DELETE"); } catch (e) { srvFehler(e); } return; }
+  if (DB) { try { await DB.doc(P() + "/" + coll + "/" + id).delete(); } catch (e) { dbFehler(e); } }
+}
+async function putApp(feld) {
+  saveLocal(); if (feld === "cfg") themaSetzen();
+  if (SRV) {
+    const inhalt = { faecher: state.faecher, plan: state.plan, cfg: state.cfg }[feld];
+    try { await api("/api/" + feld, "PUT", inhalt); } catch (e) { srvFehler(e); }
+    return;
+  }
+  if (!DB || !profil) return;
+  const map = { faecher: { liste: state.faecher }, plan: { slots: state.plan }, cfg: state.cfg };
+  try { await DB.doc(P() + "/app/" + feld).set(map[feld]); } catch (e) { dbFehler(e); }
+}
+async function putProfile() {
+  if (SRV) {
+    try { await api("/api/profil", "PUT", { klasse: profil.klasse, schulform: profil.schulform, land: profil.land, farbe: profil.h }); }
+    catch (e) { srvFehler(e); }
+    return;
+  }
+  saveProfileLocal();
+  if (!DB) return;
+  try { await DB.doc("app/profile").set({ liste: profile }); } catch (e) { dbFehler(e); }
+}
+function dbFehler(e) {
+  const c = e && e.code;
+  if (c === "quota_exceeded") toast("Speicher voll. Räum alte Einträge auf.");
+  else if (c === "resource_exhausted") toast("Zu viel auf einmal. Kurz warten.");
+  else if (c === "revoked" || c === "not_granted") { DB = null; toast("Gespeichert wird jetzt nur auf diesem Gerät."); }
+  else toast("Online speichern ging nicht. Lokal gesichert.");
+}
+
+async function initDB() {
+  let db = null;
+  try { db = await claude.use("db"); } catch (e) { db = null; }
+  if (!db) { dbBereit = true; return; }
+  DB = db;
+  try {
+    const d = await db.doc("app/profile").get();
+    if (d.exists && Array.isArray(d.data().liste)) { profile = d.data().liste; saveProfileLocal(); }
+  } catch (e) { }
+  dbBereit = true;
+  if (profil) abonniere();
+  if (!ui.setup && !ui.pin) zeigeOberflaeche();
+}
+function abonniere() {
+  unsubs.forEach(u => { try { u(); } catch (e) { } });
+  unsubs = [];
+  if (!DB || !profil) return;
+  const b = P();
+  unsubs.push(DB.collection(b + "/hausaufgaben").onSnapshot(s => {
+    state.ha = s.docs.map(d => Object.assign({ id: d.id }, d.data())); saveLocal(); render();
+  }, () => { }));
+  unsubs.push(DB.collection(b + "/tests").onSnapshot(s => {
+    state.tests = s.docs.map(d => Object.assign({ id: d.id }, d.data())); saveLocal(); render();
+  }, () => { }));
+  unsubs.push(DB.doc(b + "/app/faecher").onSnapshot(d => { if (d.exists) { state.faecher = d.data().liste || []; saveLocal(); render(); } }, () => { }));
+  unsubs.push(DB.doc(b + "/app/plan").onSnapshot(d => { if (d.exists) { state.plan = d.data().slots || []; saveLocal(); render(); } }, () => { }));
+  unsubs.push(DB.doc(b + "/app/cfg").onSnapshot(d => { if (d.exists) { state.cfg = Object.assign(state.cfg, d.data()); saveLocal(); themaSetzen(); } }, () => { }));
+}
+async function alleHochladen() {
+  if (!DB || !profil) return;
+  const b = P();
+  try {
+    for (const h of state.ha) await DB.doc(b + "/hausaufgaben/" + h.id).set(h);
+    for (const t of state.tests) await DB.doc(b + "/tests/" + t.id).set(t);
+    await DB.doc(b + "/app/faecher").set({ liste: state.faecher });
+    await DB.doc(b + "/app/plan").set({ slots: state.plan });
+    await DB.doc(b + "/app/cfg").set(state.cfg);
+  } catch (e) { dbFehler(e); }
+}
+async function altbestandUebernehmen() {
+  if (!DB) return 0;
+  let n = 0;
+  try {
+    const alt = await DB.collection("hausaufgaben").get();
+    for (const d of alt.docs) { const o = Object.assign({ id: d.id }, d.data()); state.ha.push(o); await DB.doc("hausaufgaben/" + d.id).delete(); n++; }
+    const alt2 = await DB.collection("tests").get();
+    for (const d of alt2.docs) { const o = Object.assign({ id: d.id }, d.data()); state.tests.push(o); await DB.doc("tests/" + d.id).delete(); n++; }
+    const f = await DB.doc("app/faecher").get();
+    if (f.exists && (f.data().liste || []).length) state.faecher = f.data().liste;
+    const p = await DB.doc("app/plan").get();
+    if (p.exists && (p.data().slots || []).length) state.plan = p.data().slots;
+  } catch (e) { }
+  return n;
+}
+async function initSample() {
+  try { SAMPLE = await claude.use("sample"); } catch (e) { SAMPLE = null; }
+  if (SAMPLE) { try { SAMPLE_LIMITS = await SAMPLE.limits(); } catch (e) { SAMPLE_LIMITS = null; } }
+  render();
+}
+async function initDownloads() { try { DL = await claude.use("downloads"); } catch (e) { DL = null; } }
+
+/* ===================== Eigener Server ===================== */
+async function api(pfad, methode, koerper) {
+  const opt = { method: methode || "GET", credentials: "same-origin", headers: {} };
+  if (koerper !== undefined) { opt.headers["Content-Type"] = "application/json"; opt.body = JSON.stringify(koerper); }
+  let r;
+  try { r = await fetch(pfad, opt); }
+  catch (e) { throw { code: "offline", message: "Keine Verbindung zum Server." }; }
+  let daten = null;
+  try { daten = await r.json(); } catch (e) { daten = null; }
+  if (!r.ok) throw { code: r.status, message: (daten && daten.fehler) || "Der Server hat abgelehnt." };
+  return daten || {};
+}
+function srvFehler(e) {
+  if (e && e.code === 401) { SRV = null; profil = null; toast("Du wurdest abgemeldet."); zeigeOberflaeche(); return; }
+  toast((e && e.message) || "Speichern ging nicht. Die Änderung steht nur auf diesem Gerät.");
+}
+function kontoAlsProfil(k) {
+  return { id: "k" + k.id, kontoName: k.name, name: "", klasse: k.klasse || "8", schulform: k.schulform || "Gymnasium", land: k.land || "", h: k.farbe || 214, pin: "" };
+}
+async function initWeb() {
+  SRV = true;
+  let antwort;
+  try { antwort = await api("/api/ich"); }
+  catch (e) { ui.webFehler = (e && e.message) || "Der Server antwortet nicht."; zeigeOberflaeche(); return; }
+  if (!antwort.angemeldet) { profil = null; zeigeOberflaeche(); return; }
+  await webDatenLaden(antwort.konto);
+}
+async function webDatenLaden(konto) {
+  profil = kontoAlsProfil(konto);
+  ladeDaten(profil.id);          // lokaler Zwischenstand, damit sofort etwas dasteht
+  zeigeOberflaeche();
+  if (!konto.eingerichtet) { ui.setup = { schritt: 1, h: profil.h, klasse: "8", schulform: "Gymnasium", land: "", faecher: ["Mathematik", "Deutsch", "Englisch"], beispiel: true, web: true }; $("#shell").hidden = true; $("#gate").hidden = false; gateRender(); return; }
+  try {
+    const d = await api("/api/daten");
+    state.ha = d.ha || [];
+    state.tests = d.tests || [];
+    state.faecher = d.faecher || [];
+    state.plan = d.plan || [];
+    state.cfg = Object.assign(state.cfg, d.cfg || {});
+    saveLocal(); themaSetzen(); render();
+  } catch (e) { srvFehler(e); }
+}
+const srvPfad = coll => coll === "hausaufgaben" ? "/api/hausaufgabe/" : "/api/test/";
+async function webAbmelden() {
+  try { await api("/api/abmelden", "POST"); } catch (e) { }
+  profil = null; ui.web = null; sheetZu(); zeigeOberflaeche();
+}
+/* ===================== Anmeldung ===================== */
+function zeigeOberflaeche() {
+  if (profil) { $("#gate").hidden = true; $("#shell").hidden = false; themaSetzen(); render(); }
+  else { $("#shell").hidden = true; $("#gate").hidden = false; gateRender(); }
+}
+function anmelden(p) {
+  profil = p;
+  try { localStorage.setItem(LS_AKTIV, p.id); } catch (e) { }
+  ladeDaten(p.id);
+  if (DB) abonniere();
+  zeigeOberflaeche();
+}
+function abmelden() {
+  profil = null; ui.pin = null;
+  unsubs.forEach(u => { try { u(); } catch (e) { } }); unsubs = [];
+  try { localStorage.removeItem(LS_AKTIV); } catch (e) { }
+  sheetZu(); zeigeOberflaeche();
+}
+
+function gateRender() {
+  const g = $("#gate");
+  if (ui.setup) return g.innerHTML = setupHTML();
+  if (SRV) return g.innerHTML = webGateHTML();
+  if (ui.pin) return g.innerHTML = pinHTML();
+  if (!profile.length) {
+    g.innerHTML = '<div class="box">' +
+      '<div><div class="mark">Schulplaner</div><p class="claim">Dein Schulplaner. Hausaufgaben, Termine und ein Lernbereich, der aus deinen Lernzielen Karteikarten und Quizfragen macht.</p></div>' +
+      '<div class="card" style="padding:18px; display:flex; flex-direction:column; gap:12px">' +
+      '<div class="steps">' +
+      [["Trag ein, in welche Klasse du gehst.", "person"], ["Die Erklärungen richten sich nach deinem Niveau.", "leicht"], ["Lernziele fotografieren, den Rest macht das Programm.", "kamera"]]
+        .map((x, i) => '<div class="step"><span class="n">' + (i + 1) + '</span><span class="p">' + x[0] + "</span></div>").join("") +
+      "</div>" +
+      '<button class="btn wide" data-act="setupstart">Einrichten, dauert eine Minute</button></div>' +
+      '<p class="kbdhint">Diese Seite ist schon durch dein Claude-Konto geschützt. Niemand sonst kann sie öffnen.</p>' +
+      "</div>";
+    return;
+  }
+  g.innerHTML = '<div class="box">' +
+    '<div><div class="mark">Wer lernt?</div><p class="claim">Wähle dein Profil.</p></div>' +
+    '<div class="card list">' + profile.map(p =>
+      '<button class="who" data-act="waehle" data-id="' + p.id + '">' +
+      '<span class="avatar" style="--h:' + p.h + '">' + esc(profZeichen(p)) + "</span>" +
+      '<span style="flex:1; min-width:0"><span class="n">' + esc(profName(p)) + "</span><br>" +
+      '<span class="k">' + esc(p.schulform) + (p.land ? " · " + esc(p.land) : "") + "</span></span>" +
+      (p.pin ? '<span class="dim">' + svg("schloss") + "</span>" : "") + "</button>").join("") + "</div>" +
+    '<button class="btn ghost wide" data-act="setupstart">' + svg("plus") + "Weiteres Profil</button>" +
+    "</div>";
+}
+
+function setupHTML() {
+  const s = ui.setup;
+  const kopf = (t, u) => '<div><div class="mark" style="font-size:1.7rem">' + t + '</div><p class="claim">' + u + "</p></div>";
+  if (s.schritt === 1) return '<div class="box">' + kopf("In welche Klasse gehst du?", "Danach richten sich die Erklärungen und die Quizfragen.") +
+    '<div class="card" style="padding:18px; display:flex; flex-direction:column; gap:16px">' +
+    '<div><span class="lbl">Klassenstufe</span><div class="optgrid" style="margin-top:7px">' +
+    KLASSEN.map(k => '<button data-act="suklasse" data-id="' + k + '" aria-pressed="' + (s.klasse === k) + '">' + k + "</button>").join("") + "</div></div>" +
+    '<label class="f"><span>Schulform</span><select id="su-schulform">' + SCHULFORMEN.map(x => '<option' + (x === s.schulform ? " selected" : "") + ">" + x + "</option>").join("") + "</select></label>" +
+    '<label class="f"><span>Bundesland, freiwillig</span><select id="su-land"><option value="">keine Angabe</option>' + LAENDER.map(x => '<option' + (x === s.land ? " selected" : "") + ">" + x + "</option>").join("") + "</select></label>" +
+    '<div><span class="lbl">Farbe</span><div class="optgrid" style="margin-top:7px">' +
+    [214, 352, 26, 146, 264, 186, 318, 40].map(h => '<button data-act="sufarbe" data-id="' + h + '" aria-pressed="' + (s.h === h) + '" aria-label="Farbe" style="background:hsl(' + h + ' 60% 55%); border-color:hsl(' + h + ' 60% 45%); width:44px; min-width:44px; padding:0"></button>').join("") +
+    "</div></div></div>" +
+    '<button class="btn wide" data-act="suweiter" data-id="2">Weiter</button>' +
+    (profile.length ? '<button class="btn ghost wide" data-act="suab">Abbrechen</button>' : "") + "</div>";
+
+  const gewaehlt = s.faecher;
+  return '<div class="box">' + kopf("Welche Fächer hast du?", "Kannst du später jederzeit ändern.") +
+    '<div class="card" style="padding:18px; display:flex; flex-direction:column; gap:14px">' +
+    '<div class="optgrid">' + Object.keys(FACH_HUE).map(f =>
+      '<button data-act="sufach" data-id="' + esc(f) + '" aria-pressed="' + (gewaehlt.indexOf(f) >= 0) + '">' + esc(f) + "</button>").join("") + "</div>" +
+    '<button class="tick card flat" data-act="subeispiel" aria-pressed="' + s.beispiel + '" style="border:1px solid var(--line)">' +
+    '<span class="sw"></span><span style="flex:1"><b style="font-weight:600">Mit Beispieldaten starten</b><br><span class="sm dim">Ein paar Aufgaben und ein Beispieltest, damit du siehst wie es läuft.</span></span></button>' +
+    "</div>" +
+    '<button class="btn wide" data-act="sufertig">Los geht es</button>' +
+    '<button class="btn ghost wide" data-act="suweiter" data-id="1">Zurück</button></div>';
+}
+
+function webGateHTML() {
+  const w = ui.web || (ui.web = { modus: "anmelden", name: "", fehler: "", laeuft: false });
+  const neu = w.modus === "konto";
+  return '<div class="box">' +
+    '<div><div class="mark">Schulplaner</div><p class="claim">' +
+    (neu ? "Leg dir ein Konto an. Deine Daten liegen dann auf dem Server und sind auf iPad und PC gleich."
+      : "Melde dich an, um deine Hausaufgaben, Termine und Noten zu sehen.") + "</p></div>" +
+    (ui.webFehler ? '<div class="nudge alarm">' + svg("funke") + '<span class="tx"><b>Der Server antwortet nicht</b><span class="p">' + esc(ui.webFehler) + "</span></span></div>" : "") +
+    '<div class="card" style="padding:18px; display:flex; flex-direction:column; gap:13px">' +
+    '<label class="f"><span>Benutzername</span><input type="text" id="w-name" value="' + esc(w.name) + '" autocomplete="username" autocapitalize="none" spellcheck="false" enterkeyhint="next"></label>' +
+    '<label class="f"><span>Passwort</span><input type="password" id="w-pw" autocomplete="' + (neu ? "new-password" : "current-password") + '" enterkeyhint="go"></label>' +
+    (neu ? '<label class="f"><span>Passwort wiederholen</span><input type="password" id="w-pw2" autocomplete="new-password" enterkeyhint="go"></label>' +
+      '<p class="sm dim">Mindestens 8 Zeichen. Schreib es dir auf, es gibt keine Zurücksetzung per Mail.</p>' : "") +
+    (w.fehler ? '<p class="sm" style="color:var(--rot)">' + esc(w.fehler) + "</p>" : "") +
+    '<button class="btn wide" data-act="' + (neu ? "wkonto" : "wanmelden") + '"' + (w.laeuft ? " disabled" : "") + ">" +
+    (w.laeuft ? '<span class="spin"></span>' : "") + (neu ? "Konto anlegen" : "Anmelden") + "</button>" +
+    "</div>" +
+    '<button class="btn ghost wide" data-act="wmodus">' + (neu ? "Ich habe schon ein Konto" : "Noch kein Konto? Hier anlegen") + "</button>" +
+    '<p class="kbdhint">Das Passwort wird nie im Klartext gespeichert, nur als Prüfsumme mit eigenem Salz.</p>' +
+    "</div>";
+}
+function suLesen() {
+  const s = ui.setup; if (!s || s.schritt !== 1) return;
+  const a = $("#su-schulform"), b = $("#su-land");
+  if (a) s.schulform = a.value;
+  if (b) s.land = b.value;
+}
+function pinHTML() {
+  const p = ui.pin;
+  const dots = [0, 1, 2, 3].map(i => '<i class="' + (i < p.eingabe.length ? "on" : "") + '"></i>').join("");
+  const tasten = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
+  return '<div class="box" style="max-width:330px">' +
+    '<div style="text-align:center"><span class="avatar big" style="--h:' + p.prof.h + '; margin:0 auto">' + esc(profZeichen(p.prof)) + "</span>" +
+    '<div class="mark" style="font-size:1.4rem; margin-top:12px">' + esc(profName(p.prof)) + "</div>" +
+    '<p class="claim">' + (p.neu ? "Denk dir vier Ziffern aus." : p.fehler ? "Falsch. Nochmal." : "PIN eingeben") + "</p></div>" +
+    '<div class="dots4">' + dots + "</div>" +
+    '<div class="pinpad">' + tasten.map(t => t === "" ? "<span></span>" :
+      '<button data-act="pintaste" data-id="' + t + '">' + (t === "del" ? "←" : t) + "</button>").join("") + "</div>" +
+    '<button class="btn ghost wide" data-act="pinab">Abbrechen</button></div>';
+}
+
+/* ===================== Beispieldaten ===================== */
+function seed() {
+  const h = heute();
+  const hat = n => state.faecher.some(f => f.name === n);
+  for (const n of ["Mathematik", "Deutsch", "Englisch", "Biologie"]) if (!hat(n)) state.faecher.push({ name: n, h: FACH_HUE[n] });
+  state.ha.push(
+    { id: uid(), fach: "Mathematik", titel: "Beispiel: Buch S. 42, Nr. 3 bis 7", notiz: "Steigungsdreieck einzeichnen", faellig: h, erledigt: false, erstellt: Date.now(), beispiel: true },
+    { id: uid(), fach: "Englisch", titel: "Beispiel: Vokabeln Unit 4 lernen", notiz: "", faellig: plusTage(h, 1), erledigt: false, erstellt: Date.now(), beispiel: true },
+    { id: uid(), fach: "Deutsch", titel: "Beispiel: Gedichtanalyse abgeben", notiz: "eine Seite, Reimschema nennen", faellig: plusTage(h, 3), erledigt: false, erstellt: Date.now(), beispiel: true }
+  );
+  state.tests.push({
+    id: uid(), fach: "Biologie", titel: "Beispiel: Zellbiologie", datum: plusTage(h, 9),
+    themen: [
+      { titel: "Aufbau der Tierzelle", stichpunkte: ["Zellkern, Mitochondrien, Ribosomen", "Aufgaben der Organellen"] },
+      { titel: "Unterschied Tier- und Pflanzenzelle", stichpunkte: ["Zellwand, Chloroplasten, Vakuole"] },
+      { titel: "Diffusion und Osmose", stichpunkte: ["Konzentrationsgefälle", "Versuch mit Kartoffelstäbchen"] }
+    ],
+    karten: [
+      { id: uid(), f: "Welche Aufgabe hat der Zellkern?", a: "Er enthält die DNA und steuert alle Vorgänge in der Zelle.", thema: "Aufbau der Tierzelle", box: 1, due: h, neu: true },
+      { id: uid(), f: "Nenne drei Teile, die nur die Pflanzenzelle hat.", a: "Zellwand, Chloroplasten und eine große Vakuole.", thema: "Unterschied Tier- und Pflanzenzelle", box: 1, due: h, neu: true },
+      { id: uid(), f: "Was passiert bei Osmose?", a: "Wasser wandert durch eine halbdurchlässige Membran dorthin, wo mehr gelöste Stoffe sind.", thema: "Diffusion und Osmose", box: 1, due: h, neu: true }
+    ], versuche: [], erstellt: Date.now(), beispiel: true
+  });
+  state.plan.push(
+    { id: uid(), tag: 1, von: "08:00", bis: "09:30", fach: "Mathematik", raum: "A12", beispiel: true },
+    { id: uid(), tag: 1, von: "09:50", bis: "11:20", fach: "Deutsch", raum: "B04", beispiel: true },
+    { id: uid(), tag: 2, von: "08:00", bis: "09:30", fach: "Biologie", raum: "NW2", beispiel: true },
+    { id: uid(), tag: 3, von: "10:00", bis: "11:30", fach: "Englisch", raum: "C21", beispiel: true }
+  );
+  state.cfg.seeded = true;
+}
+
+/* ===================== Niveau ===================== */
+function themaStand(t, titel) {
+  const werte = [];
+  const ks = (t.karten || []).filter(k => k.thema === titel && !k.neu);
+  if (ks.length) werte.push(ks.reduce((a, k) => a + (Math.min(k.box || 1, 5) - 1) / 4, 0) / ks.length * 100);
+  let r = 0, g = 0;
+  for (const v of (t.versuche || []).slice(-3)) {
+    const pt = (v.proThema || {})[titel];
+    if (pt) { r += pt.r; g += pt.g; }
+  }
+  if (g) werte.push(r / g * 100);
+  if (!werte.length) return null;
+  return Math.round(werte.reduce((a, b) => a + b, 0) / werte.length);
+}
+function testStand(t) {
+  const w = (t.themen || []).map(th => themaStand(t, th.titel)).filter(x => x != null);
+  if (!w.length) return null;
+  return Math.round(w.reduce((a, b) => a + b, 0) / w.length);
+}
+function standWort(s) { return s == null ? "noch offen" : s < 40 ? "wackelig" : s < 75 ? "kommt" : "sitzt"; }
+function standKlasse(s) { return s == null ? "" : s < 40 ? "schwach" : s < 75 ? "mittel" : "gut"; }
+function standHTML(s) {
+  const n = s == null ? 0 : s < 40 ? 1 : s < 75 ? 2 : 3;
+  return '<span class="stufe ' + standKlasse(s) + '"><span class="seg3">' +
+    [1, 2, 3].map(i => '<i class="' + (i <= n ? "on" : "") + '"></i>').join("") + "</span>" + standWort(s) + "</span>";
+}
+function lernkontext() {
+  let s = "Der Lernende besucht Klassenstufe " + profil.klasse + " (" + profil.schulform + ")";
+  if (profil.land) s += " in " + profil.land;
+  s += ". Antworte auf Deutsch und triff Wortwahl, Beispiele und Tiefe genau für diese Klassenstufe.";
+  return s;
+}
+function stufeNummer(stand) {
+  const pref = state.cfg.erklaerstufe || "auto";
+  if (pref === "einfach") return 0;
+  if (pref === "tief") return 2;
+  return stand == null ? 1 : (stand < 40 ? 0 : stand < 75 ? 1 : 2);
+}
+function erklaerAnweisung(stand, extraEinfach) {
+  const n = extraEinfach ? 0 : stufeNummer(stand);
+  if (extraEinfach) return "Erkläre es jetzt noch einfacher als sonst. Stell dir vor, der Lernende hört das Thema zum ersten Mal. Sätze mit höchstens zwölf Wörtern. Kein einziges Fachwort ohne eine Erklärung direkt dahinter in Klammern. Nimm einen Vergleich aus dem Alltag, den jeder kennt. Keine Formeln ohne Worte daneben.";
+  return [
+    "Erkläre es sehr einfach. Kurze Sätze. Jedes Fachwort sofort in einfachen Worten erklären. Nimm einen Vergleich aus dem Alltag.",
+    "Erkläre es klar und auf den Punkt, passend zu dieser Klassenstufe. Ein konkretes Beispiel gehört dazu.",
+    "Die Grundlagen sitzen schon. Fasse sie in zwei Sätzen zusammen und geh dann auf Feinheiten, Sonderfälle und typische Prüfungsfragen ein."
+  ][n];
+}
+function frageAnweisung(stand) {
+  const n = stufeNummer(stand);
+  return [
+    "Halte die Fragen leicht, es geht um die Grundlagen. Formuliere kurz und ohne Schachtelsätze. Die falschen Antworten sollen klar falsch sein, nicht spitzfindig.",
+    "Mittlere Schwierigkeit. Ein paar Fragen dürfen Verständnis statt Auswendiglernen verlangen.",
+    "Anspruchsvoll, mit Transfer- und Anwendungsfragen wie in einer echten Klassenarbeit. Die falschen Antworten dürfen plausibel klingen."
+  ][n];
+}
+function stufeName() {
+  const p = state.cfg.erklaerstufe || "auto";
+  return p === "einfach" ? "ganz einfach" : p === "tief" ? "ausführlich" : "automatisch";
+}
+function merkeEinfacher() {
+  state.cfg.einfachZaehler = (state.cfg.einfachZaehler || 0) + 1;
+  if (state.cfg.einfachZaehler >= 3 && (state.cfg.erklaerstufe || "auto") === "auto") {
+    state.cfg.erklaerstufe = "einfach";
+    toast("Ab jetzt wird dir immer einfacher erklärt.");
+  }
+  putApp("cfg");
+}
+/* ===================== Abfragen ===================== */
+const offeneHA = () => state.ha.filter(h => !h.erledigt);
+const faelligHeute = () => offeneHA().filter(h => tageBis(h.faellig) <= 0);
+const kommendeTests = () => state.tests.filter(t => tageBis(t.datum) >= 0).sort((a, b) => a.datum.localeCompare(b.datum));
+const vergangeneTests = () => state.tests.filter(t => tageBis(t.datum) < 0).sort((a, b) => b.datum.localeCompare(a.datum));
+function faelligeKarten() {
+  const h = heute(); let n = 0;
+  for (const t of state.tests) if (tageBis(t.datum) >= -1) for (const k of (t.karten || [])) if (!k.due || k.due <= h) n++;
+  return n;
+}
+function testFortschritt(t) {
+  const k = t.karten || [];
+  if (!k.length) return null;
+  return Math.round(k.filter(x => (x.box || 1) >= 4).length / k.length * 100);
+}
+function lektionenAm(iso) {
+  const tag = fromISO(iso).getDay();
+  return state.plan.filter(s => s.tag === tag).sort((a, b) => String(a.von).localeCompare(String(b.von)));
+}
+function streakTage() {
+  const l = (state.cfg.streak || []).slice().sort();
+  if (!l.length) return 0;
+  let n = 0, d = heute();
+  if (l[l.length - 1] !== d && l[l.length - 1] !== plusTage(d, -1)) return 0;
+  if (l[l.length - 1] === plusTage(d, -1)) d = plusTage(d, -1);
+  while (l.includes(d)) { n++; d = plusTage(d, -1); }
+  return n;
+}
+function markiereLerntag() {
+  const h = heute(); const l = state.cfg.streak || [];
+  if (!l.includes(h)) { state.cfg.streak = l.concat([h]).slice(-140); putApp("cfg"); }
+}
+function nudges() {
+  const out = [];
+  for (const t of offeneNoten().slice(0, 3))
+    out.push({ typ: "warn", icon: "stift", titel: "Wie lief der " + t.fach + "-Test?", text: t.titel + " · " + relTag(t.datum) + " geschrieben. Note eintragen.", act: "note:" + t.id });
+  const ueber = offeneHA().filter(h => tageBis(h.faellig) < 0);
+  if (ueber.length) out.push({ typ: "alarm", icon: "uhr", titel: ueber.length === 1 ? "1 Aufgabe ist überfällig" : ueber.length + " Aufgaben sind überfällig", text: ueber.slice(0, 3).map(h => h.titel).join(" · "), act: "go:aufgaben" });
+  const hh = offeneHA().filter(h => tageBis(h.faellig) === 0);
+  if (hh.length) out.push({ typ: "warn", icon: "aufgaben", titel: hh.length + (hh.length === 1 ? " Aufgabe ist heute fällig" : " Aufgaben sind heute fällig"), text: hh.slice(0, 3).map(h => h.titel).join(" · "), act: "go:aufgaben" });
+  const mo = offeneHA().filter(h => tageBis(h.faellig) === 1);
+  if (mo.length) out.push({ typ: "info", icon: "aufgaben", titel: mo.length + (mo.length === 1 ? " Aufgabe für morgen" : " Aufgaben für morgen"), text: mo.slice(0, 3).map(h => h.titel).join(" · "), act: "go:aufgaben" });
+  for (const t of kommendeTests()) {
+    const d = tageBis(t.datum);
+    if (d > 7) continue;
+    const s = testStand(t);
+    out.push({
+      typ: d <= 2 ? "alarm" : d <= 4 ? "warn" : "info", icon: "lernen",
+      titel: t.fach + "-Test " + (d === 0 ? "ist heute" : d === 1 ? "ist morgen" : "in " + d + " Tagen"),
+      text: t.titel + (s != null ? " · Stand " + s + "%" : ""), act: "test:" + t.id
+    });
+  }
+  const fk = faelligeKarten();
+  if (fk) out.push({ typ: "info", icon: "karte", titel: fk + (fk === 1 ? " Karteikarte wartet" : " Karteikarten warten"), text: "Kurze Runde, ein paar Minuten.", act: "go:lernen" });
+  return out;
+}
+
+/* ===================== Rendern ===================== */
+const TABS = [
+  { id: "heute", label: "Heute", icon: "heute" }, { id: "aufgaben", label: "Aufgaben", icon: "aufgaben" },
+  { id: "kalender", label: "Kalender", icon: "kalender" }, { id: "lernen", label: "Lernen", icon: "lernen" },
+  { id: "scan", label: "Scan", icon: "scan" }
+];
+function render() {
+  if (!profil) return;
+  const cnt = { aufgaben: faelligHeute().length, lernen: faelligeKarten() };
+  $("#tabs").innerHTML = TABS.map(t =>
+    '<button class="tab" data-act="tab" data-id="' + t.id + '"' + (ui.tab === t.id ? ' aria-current="page"' : "") + ">" +
+    svg(t.icon) + "<span>" + (t.id === "scan" && !SAMPLE ? "Tests" : t.label) + "</span>" +
+    (cnt[t.id] ? '<span class="cnt">' + Math.min(cnt[t.id], 99) + "</span>" : "") + "</button>").join("");
+  const d = new Date();
+  $("#topdate").textContent = WDK[d.getDay()] + " " + d.getDate() + ". " + MON[d.getMonth()];
+  const n = nudges().length;
+  $("#bellbtn").innerHTML = svg("glocke") + (n ? '<span class="badge">' + n + "</span>" : "");
+  $("#profbtn").innerHTML = '<span class="avatar mini" style="--h:' + profil.h + '">' + esc(profZeichen(profil)) + "</span>";
+  const kamOk = !!(SAMPLE && SAMPLE_LIMITS && SAMPLE_LIMITS.images);
+  $("#fab").innerHTML =
+    '<button class="fb alt" data-act="fabha" aria-label="Hausaufgabe eintragen">' + svg("plus") + "<span>Hausaufgabe</span></button>" +
+    '<button class="fb prim" data-act="fabscan">' + svg(kamOk ? "kamera" : "stift") + (kamOk ? "Lernziel scannen" : "Lernziel eintragen") + "</button>";
+  const v = $("#view");
+  v.innerHTML = ({ heute: viewHeute, aufgaben: viewAufgaben, kalender: viewKalender, lernen: viewLernen, scan: viewScan }[ui.tab])();
+}
+
+function haItem(h, opts) {
+  opts = opts || {};
+  const d = tageBis(h.faellig);
+  const pill = h.erledigt ? '<span class="pill gruen">erledigt</span>'
+    : d < 0 ? '<span class="pill rot">' + relTag(h.faellig) + "</span>"
+      : d === 0 ? '<span class="pill ocker">heute</span>' : '<span class="pill grau">' + relTag(h.faellig) + "</span>";
+  return '<div class="item' + (h.erledigt ? " done" : "") + '">' +
+    '<button class="check" data-act="toggleha" data-id="' + h.id + '" aria-label="Erledigt" aria-pressed="' + !!h.erledigt + '">' + svg("check") + "</button>" +
+    '<button class="body" data-act="editha" data-id="' + h.id + '">' +
+    '<span class="t">' + esc(h.titel) + "</span>" +
+    '<span class="meta"><span class="chip" style="--h:' + hueVon(h.fach) + '">' + esc(h.fach || "Allgemein") + "</span>" + (opts.ohneDatum ? "" : pill) + "</span>" +
+    (h.notiz ? '<span class="note">' + esc(h.notiz) + "</span>" : "") + "</button></div>";
+}
+function nudgeHTML(n, klick) {
+  const cls = n.typ === "alarm" ? "alarm" : n.typ === "warn" ? "warn" : "";
+  const inner = svg(n.icon) + '<span class="tx"><b>' + esc(n.titel) + '</b><span class="p">' + esc(n.text) + "</span></span>";
+  return klick ? '<button class="nudge ' + cls + '" data-act="nudge" data-id="' + n.act + '">' + inner + "</button>"
+    : '<div class="nudge ' + cls + '">' + inner + "</div>";
+}
+function gruss() {
+  const hh = new Date().getHours();
+  return hh < 11 ? "Guten Morgen" : hh < 17 ? "Guten Tag" : "Guten Abend";
+}
+function zusammenfassung() {
+  const a = faelligHeute().length, t = kommendeTests()[0], k = faelligeKarten(), teile = [];
+  teile.push(a === 0 ? "keine Aufgabe fällig" : a === 1 ? "1 Aufgabe fällig" : a + " Aufgaben fällig");
+  if (k) teile.push(k + (k === 1 ? " Karte" : " Karten") + " zum Wiederholen");
+  if (t) teile.push(t.fach + "-Test " + relTag(t.datum));
+  return teile.join(" · ");
+}
+function testKarte(t) {
+  const d = tageBis(t.datum), p = testFortschritt(t), s = testStand(t);
+  const benotet = typeof t.note === "number";
+  let zahl = d === 0 ? "heute" : d < 0 ? Math.abs(d) : d;
+  let einheit = d === 0 ? "" : d < 0 ? (Math.abs(d) === 1 ? "Tag her" : "Tage her") : (d === 1 ? "Tag" : "Tage");
+  if (benotet) { zahl = '<span style="color:var(--' + notenGut(t.note) + ')">' + notenText(t.note) + "</span>"; einheit = (t.gewicht || 1) === 2 ? "zählt doppelt" : "Ergebnis"; }
+  else if (d < 0) { zahl = "?"; einheit = "Note fehlt"; }
+  const bcls = s == null ? "" : s < 40 ? " rot" : s < 75 ? " ocker" : " gruen";
+  return '<button class="card testcard' + (d >= 0 && d <= 3 ? " soon" : "") + '" data-act="test" data-id="' + t.id + '">' +
+    '<span class="l1"><span class="body">' +
+    '<span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + "</span>" +
+    '<h3 style="margin-top:7px">' + esc(t.titel) + "</h3>" +
+    '<span class="dim sm mono">' + datumKurz(t.datum) + " · " + (t.themen || []).length + " Themen · " + (t.karten || []).length + " Karten</span>" +
+    '</span><span class="when"><span class="num">' + zahl + '</span><span class="unit">' + einheit + "</span></span></span>" +
+    (s != null ? '<span class="barrow"><span class="bar' + bcls + '"><i style="width:' + s + '%"></i></span><span class="pct">' + s + "%</span></span>"
+      : p ? '<span class="barrow"><span class="bar"><i style="width:' + p + '%"></i></span><span class="pct">' + p + "%</span></span>"
+        : (t.karten || []).length ? '<span class="dim sm">noch nicht geübt</span>' : "") +
+    "</button>";
+}
+
+function viewHeute() {
+  const h = heute(), lek = lektionenAm(h), ns = nudges().slice(0, 3);
+  const fh = offeneHA().filter(x => tageBis(x.faellig) <= 0).sort((a, b) => a.faellig.localeCompare(b.faellig));
+  const bald = offeneHA().filter(x => { const d = tageBis(x.faellig); return d > 0 && d <= 3; }).sort((a, b) => a.faellig.localeCompare(b.faellig));
+  const kt = kommendeTests().slice(0, 3), st = streakTage();
+  let s = '<section class="sec"><div class="card hero">' +
+    '<span class="tag">' + datumLang(h) + '</span><h1>' + esc(gruss()) + "</h1>" +
+    '<p class="sub">' + esc(zusammenfassung()) + "</p>" +
+    (st > 1 ? '<p class="sub"><span class="pill tinte">' + st + " Tage Lernserie</span></p>" : "") + "</div></section>";
+  if (ns.length) s += '<section class="sec">' + ns.map(n => nudgeHTML(n, true)).join("") + "</section>";
+  if (lek.length) s += '<section class="sec"><header><h2>Stundenplan</h2><span class="lbl">' + WD[fromISO(h).getDay()] + '</span></header><div class="card list">' +
+    lek.map(l => '<div class="slot"><span class="rule" style="--h:' + hueVon(l.fach) + '"></span><span class="time">' + esc(l.von) + '</span>' +
+      '<span style="flex:1"><b style="font-weight:500">' + esc(l.fach) + "</b>" + (l.raum ? ' <span class="dim sm">' + esc(l.raum) + "</span>" : "") + "</span>" +
+      '<span class="time">' + esc(l.bis) + "</span></div>").join("") + "</div></section>";
+  s += '<section class="sec"><header><h2>Jetzt dran</h2><span class="lbl">' + fh.length + " offen</span></header>" +
+    (fh.length ? '<div class="card list">' + fh.map(x => haItem(x)).join("") + "</div>" : '<div class="empty">Nichts überfällig. Gut gemacht.</div>') + "</section>";
+  if (bald.length) s += '<section class="sec"><header><h2>Die nächsten Tage</h2></header><div class="card list">' + bald.map(x => haItem(x)).join("") + "</div></section>";
+  s += '<section class="sec"><header><h2>Nächste Tests</h2></header>' +
+    (kt.length ? '<div class="stack-s">' + kt.map(testKarte).join("") + "</div>"
+      : '<div class="empty">Kein Test eingetragen. Scanne deine Lernziele im Tab <b>Scan</b>.</div>') + "</section>";
+  s += '<section class="sec"><div class="btnrow">' +
+    '<button class="btn soft" data-act="neueha">' + svg("plus") + "Aufgabe</button>" +
+    '<button class="btn ghost" data-act="tab" data-id="scan">' + svg("kamera") + "Lernziele scannen</button></div></section>";
+  return s;
+}
+
+function viewAufgaben() {
+  const f = ui.filter;
+  let liste = state.ha.slice();
+  if (f === "offen") liste = liste.filter(h => !h.erledigt);
+  else if (f === "heute") liste = liste.filter(h => !h.erledigt && tageBis(h.faellig) <= 0);
+  else if (f === "woche") liste = liste.filter(h => !h.erledigt && tageBis(h.faellig) <= 7);
+  else if (f === "erledigt") liste = liste.filter(h => h.erledigt);
+  if (ui.fach) liste = liste.filter(h => h.fach === ui.fach);
+  liste.sort((a, b) => (a.erledigt - b.erledigt) || a.faellig.localeCompare(b.faellig) || b.erstellt - a.erstellt);
+  const gruppen = {};
+  for (const h of liste) (gruppen[h.faellig] = gruppen[h.faellig] || []).push(h);
+  let s = '<section class="sec"><div class="quick"><input type="text" id="quick" placeholder="Mathe Buch S. 42 Nr. 3 bis Freitag" autocomplete="off" enterkeyhint="done">' +
+    (SAMPLE ? '<button class="btn" data-act="quickadd" aria-label="Erkennen">' + svg("funke") + "</button>" : "") +
+    '<button class="btn ' + (SAMPLE ? "ghost" : "") + '" data-act="neueha" aria-label="Von Hand">' + svg("plus") + "</button></div>" +
+    (SAMPLE ? '<p class="kbdhint">Einfach hintippen, der Funken-Knopf erkennt Fach und Datum.</p>' : "") + "</section>";
+  s += '<section class="sec"><div class="filters">' +
+    [["offen", "Offen"], ["heute", "Heute fällig"], ["woche", "Diese Woche"], ["alle", "Alle"], ["erledigt", "Erledigt"]]
+      .map(x => '<button data-act="filter" data-id="' + x[0] + '" aria-pressed="' + (f === x[0]) + '">' + x[1] + "</button>").join("") + "</div>" +
+    (state.faecher.length > 1 ? '<div class="filters">' + state.faecher.map(fa =>
+      '<button data-act="fachfilter" data-id="' + esc(fa.name) + '" aria-pressed="' + (ui.fach === fa.name) + '">' +
+      '<span class="dot" style="--h:' + fa.h + '; display:inline-block; margin-right:6px"></span>' + esc(fa.name) + "</button>").join("") + "</div>" : "") +
+    "</section>";
+  const keys = Object.keys(gruppen).sort();
+  if (f === "erledigt") keys.reverse();
+  s += '<section class="sec">';
+  if (!keys.length) s += '<div class="empty">' + (f === "erledigt" ? "Noch nichts abgehakt." : "Keine Aufgaben hier. Trag oben etwas ein.") + "</div>";
+  for (const k of keys) {
+    const ueber = tageBis(k) < 0 && f !== "erledigt";
+    s += '<div class="daygroup" style="margin-bottom:14px"><div class="head">' +
+      '<span class="d"' + (ueber ? ' style="color:var(--rot)"' : "") + ">" + datumKurz(k) + '</span><span class="n">' + relTag(k) + "</span></div>" +
+      '<div class="card list">' + gruppen[k].map(x => haItem(x, { ohneDatum: true })).join("") + "</div></div>";
+  }
+  return s + "</section>";
+}
+
+function viewKalender() {
+  let s = '<section class="sec"><div class="seg" style="margin-bottom:4px">' +
+    [["monat", "Monat"], ["woche", "Woche"]].map(x => '<button data-act="calansicht" data-id="' + x[0] + '" aria-pressed="' + (ui.calAnsicht === x[0]) + '">' + x[1] + "</button>").join("") + "</div></section>";
+  return s + (ui.calAnsicht === "woche" ? wocheHTML() : monatHTML());
+}
+function monatHTML() {
+  const base = ui.calM ? fromISO(ui.calM + "-01") : fromISO(heute().slice(0, 7) + "-01");
+  const jahr = base.getFullYear(), mon = base.getMonth();
+  const erster = new Date(jahr, mon, 1);
+  const start = new Date(jahr, mon, 1 - ((erster.getDay() + 6) % 7));
+  const h = heute(), marker = {};
+  for (const x of state.ha) if (!x.erledigt) (marker[x.faellig] = marker[x.faellig] || { hues: [], test: false }).hues.push(hueVon(x.fach));
+  for (const t of state.tests) { const m = (marker[t.datum] = marker[t.datum] || { hues: [], test: false }); m.test = true; }
+  let tage = "";
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const iso = toISO(d), m = marker[iso];
+    const dots = m ? (m.test ? '<span class="ex"></span>' : "") + m.hues.filter((x, j, a) => a.indexOf(x) === j).slice(0, 3).map(hu => '<span class="dot" style="--h:' + hu + '"></span>').join("") : "";
+    tage += '<button class="day' + (d.getMonth() !== mon ? " out" : "") + (iso === h ? " today" : "") + '" data-act="calday" data-id="' + iso + '" aria-pressed="' + (iso === ui.calSel) + '">' +
+      "<span>" + d.getDate() + '</span><span class="dots">' + dots + "</span></button>";
+  }
+  let s = '<section class="sec"><div class="calhead">' +
+    '<button class="iconbtn" data-act="calmon" data-id="-1" aria-label="Vorheriger Monat">' + svg("zurueck") + "</button>" +
+    "<h2>" + MON[mon] + " " + jahr + '</h2><button class="btn ghost small" data-act="calheute">Heute</button>' +
+    '<button class="iconbtn" data-act="calmon" data-id="1" aria-label="Nächster Monat" style="transform:rotate(180deg)">' + svg("zurueck") + "</button></div>" +
+    '<div class="card cal">' + ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map(w => '<span class="wd">' + w + "</span>").join("") + tage + "</div></section>";
+  return s + tagDetail(ui.calSel);
+}
+function tagDetail(sel) {
+  const lek = lektionenAm(sel), tests = state.tests.filter(t => t.datum === sel), has = state.ha.filter(x => x.faellig === sel);
+  let s = '<section class="sec"><header><h2>' + datumLang(sel) + "</h2></header>";
+  if (lek.length) s += '<div class="card list" style="margin-bottom:10px">' + lek.map(l =>
+    '<div class="slot"><span class="rule" style="--h:' + hueVon(l.fach) + '"></span><span class="time">' + esc(l.von) + '</span><span style="flex:1">' + esc(l.fach) + (l.raum ? ' <span class="dim sm">' + esc(l.raum) + "</span>" : "") + "</span></div>").join("") + "</div>";
+  if (tests.length) s += '<div class="stack-s" style="margin-bottom:10px">' + tests.map(testKarte).join("") + "</div>";
+  if (has.length) s += '<div class="card list">' + has.map(x => haItem(x, { ohneDatum: true })).join("") + "</div>";
+  if (!lek.length && !tests.length && !has.length) s += '<div class="empty">An diesem Tag ist nichts eingetragen.</div>';
+  return s + '<div class="btnrow" style="margin-top:12px">' +
+    '<button class="btn soft" data-act="neueha" data-id="' + sel + '">' + svg("plus") + "Aufgabe an diesem Tag</button>" +
+    '<button class="btn ghost" data-act="neuertest" data-id="' + sel + '">' + svg("lernen") + "Test eintragen</button></div></section>";
+}
+function wocheHTML() {
+  const basis = ui.calSel || heute();
+  const d0 = fromISO(basis); const mo = plusTage(basis, -((d0.getDay() + 6) % 7));
+  let s = '<section class="sec"><div class="calhead">' +
+    '<button class="iconbtn" data-act="calwoche" data-id="-7" aria-label="Woche zurück">' + svg("zurueck") + "</button>" +
+    "<h2>" + datumKurz(mo) + " bis " + datumKurz(plusTage(mo, 6)) + '</h2><button class="btn ghost small" data-act="calheute">Heute</button>' +
+    '<button class="iconbtn" data-act="calwoche" data-id="7" aria-label="Woche vor" style="transform:rotate(180deg)">' + svg("zurueck") + "</button></div></section>";
+  s += '<section class="sec">';
+  for (let i = 0; i < 7; i++) {
+    const iso = plusTage(mo, i), lek = lektionenAm(iso);
+    const tests = state.tests.filter(t => t.datum === iso), has = state.ha.filter(x => x.faellig === iso && !x.erledigt);
+    if (i === 5 && !lek.length && !tests.length && !has.length && !state.ha.some(x => x.faellig === plusTage(mo, 6) && !x.erledigt)) { }
+    s += '<div class="wcol" style="margin-bottom:14px"><div class="hd' + (iso === heute() ? " jetzt" : "") + '"><b>' + WD[fromISO(iso).getDay()] + '</b><span class="n mono dim sm">' + datumKurz(iso).slice(3) + "</span>" +
+      (iso === heute() ? '<span class="pill tinte">heute</span>' : "") + "</div>";
+    if (!lek.length && !tests.length && !has.length) s += '<div class="empty" style="padding:12px">nichts</div>';
+    else {
+      if (lek.length) s += '<div class="card list flat">' + lek.map(l => '<div class="slot"><span class="rule" style="--h:' + hueVon(l.fach) + '"></span><span class="time">' + esc(l.von) + '</span><span style="flex:1">' + esc(l.fach) + "</span></div>").join("") + "</div>";
+      if (tests.length) s += '<div class="stack-s">' + tests.map(t => '<button class="card nudge alarm" data-act="test" data-id="' + t.id + '">' + svg("lernen") + '<span class="tx"><b>' + esc(t.fach) + "-Test</b><span class=\"p\">" + esc(t.titel) + "</span></span></button>").join("") + "</div>";
+      if (has.length) s += '<div class="card list">' + has.map(x => haItem(x, { ohneDatum: true })).join("") + "</div>";
+    }
+    s += "</div>";
+  }
+  return s + "</section>";
+}
+
+function viewLernen() {
+  const kt = kommendeTests(), vt = vergangeneTests().slice(0, 4), fk = faelligeKarten();
+  let s = "";
+  if (SAMPLE) s += '<section class="sec"><div class="fragebox">' +
+    '<input type="text" id="frage" placeholder="Stell eine Frage, zum Beispiel: Was ist eine Nullstelle?" autocomplete="off" enterkeyhint="send">' +
+    '<button class="btn" data-act="fragab" aria-label="Fragen">' + svg("funke") + "</button></div></section>";
+  if (fk) s += '<section class="sec"><button class="nudge" data-act="lernenalle">' + svg("karte") +
+    '<span class="tx"><b>' + fk + (fk === 1 ? " Karte" : " Karten") + ' sind dran</b><span class="p">Wiederholen, solange es noch sitzt. Dauert ein paar Minuten.</span></span></button></section>';
+  const ohneNote = offeneNoten();
+  if (ohneNote.length) s += '<section class="sec"><header><h2>Note eintragen</h2></header><div class="card list">' +
+    ohneNote.slice(0, 4).map(t => '<button class="item" data-act="note" data-id="' + t.id + '"><span class="body">' +
+      '<span class="t">' + esc(t.titel) + '</span><span class="meta"><span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + "</span>" +
+      '<span class="pill grau">' + relTag(t.datum) + "</span></span></span>" + svg("stift") + "</button>").join("") + "</div></section>";
+  const plan = kt.slice().sort((a, b) => { const x = aufwand(a), y = aufwand(b); return (y.min / Math.max(1, y.tage)) - (x.min / Math.max(1, x.tage)); }).slice(0, 2);
+  if (plan.length) s += '<section class="sec"><header><h2>Worauf du dich konzentrieren solltest</h2></header>' +
+    '<div class="stack-s">' + plan.map(t => '<div class="card" style="padding:14px; display:flex; flex-direction:column; gap:11px">' +
+      '<div class="row"><span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + "</span>" +
+      '<b style="font-family:var(--disp); flex:1; min-width:0">' + esc(t.titel) + "</b>" +
+      '<span class="pill ' + (tageBis(t.datum) <= 2 ? "rot" : "tinte") + '">' + relTag(t.datum) + "</span></div>" +
+      aufwandBox(t, true) +
+      '<div class="btnrow"><button class="btn small" data-act="test" data-id="' + t.id + '">Öffnen</button>' +
+      ((t.karten || []).length ? '<button class="btn ghost small" data-act="flash" data-id="' + t.id + '">Karten</button>' : "") + "</div></div>").join("") + "</div></section>";
+  const schwach = [];
+  for (const t of kt) for (const th of (t.themen || [])) { const st = themaStand(t, th.titel); if (st != null && st < 40) schwach.push({ t: t, th: th, s: st }); }
+  if (schwach.length) s += '<section class="sec"><header><h2>Da hakt es noch</h2></header><div class="card list">' +
+    schwach.slice(0, 5).map(x => '<button class="item" data-act="erklaer" data-id="' + x.t.id + ":" + (x.t.themen.indexOf(x.th)) + '">' +
+      '<span class="body"><span class="t">' + esc(x.th.titel) + '</span><span class="meta"><span class="chip" style="--h:' + hueVon(x.t.fach) + '">' + esc(x.t.fach) + "</span>" + standHTML(x.s) + "</span></span></button>").join("") +
+    '</div><p class="kbdhint">Antippen und du bekommst es erklärt, so einfach wie du es brauchst.</p></section>';
+  s += '<section class="sec"><header><h2>Anstehende Tests</h2><span class="lbl">' + kt.length + "</span></header>" +
+    (kt.length ? '<div class="stack-s">' + kt.map(testKarte).join("") + "</div>"
+      : '<div class="empty">Noch kein Test eingetragen.<br>Scanne deinen Lernzielkatalog, dann baue ich Themen, Karteikarten und Quiz daraus.</div>') +
+    '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="tab" data-id="scan">' + svg("kamera") + "Lernziele scannen</button>" +
+    '<button class="btn ghost" data-act="neuertest">' + svg("plus") + "Test von Hand</button></div></section>";
+  const mitNoten = state.faecher.filter(f => schnittFach(f.name) != null || zielVon(f.name) != null);
+  const ges = gesamtSchnitt();
+  s += '<section class="sec"><header><h2>Noten und Ziele</h2>' +
+    (ges != null ? '<span class="lbl">Schnitt ' + notenText(ges) + "</span>" : "") + "</header>" +
+    (mitNoten.length ? '<div class="card list">' + mitNoten.map(f => {
+      const sch = schnittFach(f.name), z = zielVon(f.name);
+      const erreicht = sch != null && z != null && (punkteSystem() ? sch >= z : sch <= z);
+      return '<button class="zeile" data-act="ziele">' +
+        '<span class="dot" style="--h:' + f.h + '; width:11px; height:11px"></span>' +
+        '<span class="nm">' + esc(f.name) + "</span>" +
+        (z != null ? '<span class="pill ' + (sch == null ? "grau" : erreicht ? "gruen" : "ocker") + '">Ziel ' + notenText(z) + "</span>" : '<span class="pill grau">kein Ziel</span>') +
+        '<span class="notegross" style="min-width:56px; text-align:right; color:var(--' + (notenGut(sch) === "grau" ? "ink-3" : notenGut(sch)) + ')">' + notenText(sch) + "</span></button>";
+    }).join("") + "</div>"
+      : '<div class="empty">Noch keine Noten. Trag ein Ziel ein, dann wird dir ausgerechnet, wie viel du für jeden Test tun musst.</div>') +
+    '<button class="btn ghost wide" data-act="ziele" style="margin-top:10px">' + svg("hoch") + "Ziele setzen und Noten ansehen</button></section>";
+  if (vt.length) s += '<section class="sec"><header><h2>Vorbei</h2></header><div class="stack-s">' + vt.map(testKarte).join("") + "</div></section>";
+  return s;
+}
+
+function viewScan() {
+  const bilder = SAMPLE_LIMITS && SAMPLE_LIMITS.images;
+  let s = '<section class="sec"><div class="card hero"><span class="tag">' + (SAMPLE ? "Lernziele einlesen" : "Arbeiten und Lernziele") + "</span>" +
+    (SAMPLE ? "<h1>Foto rein, Lernplan raus</h1>" +
+      '<p class="sub">Fotografiere den Lernzielkatalog, das Arbeitsblatt oder das Tafelbild. Erkannt wird von selbst, ob es ein Test oder Hausaufgaben sind. Passend für Klasse ' + esc(profil.klasse) + ".</p>"
+      : "<h1>Tests und Themen</h1>" +
+      '<p class="sub">Trag deine Arbeiten mit ihren Themen ein. Der Kalender, der Lernstand, die Noten und die Aufwandsrechnung arbeiten damit weiter.</p>') +
+    "</div></section>";
+  if (!SAMPLE) return s + '<section class="sec"><div class="card" style="padding:16px">' +
+    '<b style="font-family:var(--disp)">Diese Fassung liest keine Fotos</b>' +
+    '<p class="sm muted" style="margin-top:6px">Das Auslesen von Bildern, die Karteikarten, das Quiz und die Erklärungen brauchen Claude. Sie laufen nur in der Fassung, die du über deinen Claude-Konto-Link öffnest. Alles andere, also Hausaufgaben, Kalender, Stundenplan, Noten und Ziele, funktioniert hier genauso.</p>' +
+    '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="neuertest">' + svg("plus") + "Test von Hand eintragen</button></div></div></section>";
+  const sc = ui.scan;
+  if (!sc || sc.phase === "leer") {
+    s += '<section class="sec"><div class="dropzone card flat">' + svg("kamera") +
+      '<div style="text-align:center"><b>Noch kein Bild</b><p class="sm dim">Bis zu ' + ((bilder && bilder.maxCount) || 1) + " Bilder auf einmal.</p></div>" +
+      '<div class="btnrow" style="justify-content:center">' +
+      (bilder ? '<button class="btn" data-act="foto">' + svg("kamera") + 'Foto aufnehmen</button><button class="btn ghost" data-act="galerie">Aus Fotos wählen</button>' : "") +
+      '<button class="btn ghost" data-act="textscan">' + svg("stift") + "Text abtippen</button></div>" +
+      (bilder ? '<p class="kbdhint">Auf dem iPad kommt die Auswahl von iOS. Tippe dort auf <b>Foto aufnehmen</b>, falls die Kamera nicht sofort aufgeht.</p>' : "") + "</div>" +
+      '<div class="card" style="padding:16px; margin-top:14px"><span class="lbl">So läuft es</span><div class="steps" style="margin-top:10px">' +
+      ["Foto machen oder Text einfügen.", "Fach, Datum und alle Themen werden erkannt.", "Du prüfst kurz und speicherst.", "Karteikarten und Quiz werden daraus gebaut, auf deinem Niveau."]
+        .map((t, i) => '<div class="step"><span class="n">' + (i + 1) + '</span><span class="p">' + t + "</span></div>").join("") + "</div></div></section>";
+    return s;
+  }
+  if (sc.phase === "bilder") return s + '<section class="sec"><div class="thumbs">' + sc.urls.map((u, i) =>
+    '<figure><img src="' + u + '" alt="Aufnahme ' + (i + 1) + '"><button data-act="scanweg" data-id="' + i + '" aria-label="Entfernen">✕</button></figure>').join("") + "</div>" +
+    '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="scanlesen">' + svg("funke") + "Erkennen</button>" +
+    (sc.urls.length < ((bilder && bilder.maxCount) || 1) ? '<button class="btn ghost" data-act="foto">Noch ein Foto</button>' : "") +
+    '<button class="btn ghost" data-act="scanreset">Abbrechen</button></div></section>';
+  if (sc.phase === "text") return s + '<section class="sec"><label class="f"><span>Lernziele oder Aufgaben als Text</span>' +
+    '<textarea id="scantext" rows="9" placeholder="Klassenarbeit Mathe am 25.09.&#10;- Lineare Funktionen zeichnen&#10;- Steigung berechnen">' + esc(sc.text || "") + "</textarea></label>" +
+    '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="textlesen">' + svg("funke") + "Erkennen</button>" +
+    '<button class="btn ghost" data-act="scanreset">Abbrechen</button></div></section>';
+  if (sc.phase === "laeuft") return s + '<section class="sec"><div class="card" style="padding:26px; text-align:center">' +
+    '<span class="row" style="justify-content:center"><span class="spin"></span><b>' + esc(sc.info || "Wird gelesen...") + "</b></span>" +
+    '<p class="sm dim" style="margin-top:8px">Das dauert ein paar Sekunden.</p></div></section>';
+  if (sc.phase === "fertig") {
+    const e = sc.erg;
+    if (e.art === "hausaufgaben") {
+      return s + '<section class="sec"><header><h2>Hausaufgaben erkannt</h2><span class="lbl">bitte kurz prüfen</span></header>' +
+        '<div class="card list">' + e.aufgaben.map((a, i) =>
+          '<div class="item"><span class="body"><span class="t">' + esc(a.titel) + '</span><span class="meta">' +
+          '<span class="chip" style="--h:' + hueVon(a.fach) + '">' + esc(a.fach) + '</span><span class="pill grau">' + relTag(a.faellig) + "</span></span></span>" +
+          '<button class="iconbtn" data-act="scanhaweg" data-id="' + i + '" aria-label="Weg">' + svg("x") + "</button></div>").join("") + "</div>" +
+        '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="scanhaspeichern">' + svg("check") + "Alle eintragen</button>" +
+        '<button class="btn ghost" data-act="scanreset">Verwerfen</button></div></section>';
+    }
+    return s + '<section class="sec"><header><h2>Test erkannt</h2><span class="lbl">bitte kurz prüfen</span></header>' +
+      (e.datum ? '<div class="nudge" style="margin-bottom:10px">' + svg("kalender") + '<span class="tx"><b>Kommt in den Kalender</b><span class="p">' + esc(datumLang(e.datum)) + ", " + esc(relTag(e.datum)) + ". Du wirst rechtzeitig vorher erinnert.</span></span></div>"
+        : '<div class="nudge warn" style="margin-bottom:10px">' + svg("kalender") + '<span class="tx"><b>Kein Datum erkannt</b><span class="p">Trag unten ein, wann die Arbeit ist, dann landet sie im Kalender.</span></span></div>') +
+      '<div class="card" style="padding:16px; display:flex; flex-direction:column; gap:12px">' +
+      '<div class="grid2"><label class="f"><span>Fach</span><input type="text" id="e-fach" value="' + esc(e.fach) + '"></label>' +
+      '<label class="f"><span>Datum</span><input type="date" id="e-datum" value="' + esc(e.datum || "") + '"></label></div>' +
+      '<label class="f"><span>Titel</span><input type="text" id="e-titel" value="' + esc(e.titel) + '"></label>' +
+      '<div><span class="lbl">' + e.themen.length + ' Themen</span><ul class="stack-s" style="margin-top:8px">' +
+      e.themen.map((t, i) => '<li class="card flat" style="padding:11px 13px"><b style="font-weight:600; font-size:.95rem">' + esc(t.titel) + "</b>" +
+        (t.stichpunkte && t.stichpunkte.length ? '<p class="sm muted" style="margin-top:3px">' + esc(t.stichpunkte.join(" · ")) + "</p>" : "") +
+        '<button class="btn danger small" style="margin-top:8px" data-act="themaweg" data-id="' + i + '">Thema raus</button></li>').join("") + "</ul></div></div>" +
+      '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="scanspeichern">' + svg("check") + "Test anlegen und lernen</button>" +
+      '<button class="btn ghost" data-act="scanreset">Verwerfen</button></div></section>';
+  }
+  return s;
+}
+/* ===================== Sheets ===================== */
+function sheet(titel, body, footer, opts) {
+  opts = opts || {};
+  $("#sheet").innerHTML = '<div class="panel" role="dialog" aria-modal="true" aria-label="' + esc(titel) + '">' +
+    "<header>" + (opts.zurueck ? '<button class="iconbtn" data-act="' + opts.zurueck + '" aria-label="Zurück">' + svg("zurueck") + "</button>" : "") +
+    "<h2>" + esc(titel) + '</h2><button class="iconbtn" data-act="sheetzu" aria-label="Schließen">' + svg("x") + "</button></header>" +
+    '<div class="body">' + body + "</div>" + (footer ? "<footer>" + footer + "</footer>" : "") + "</div>";
+  $("#sheet").hidden = false;
+}
+function sheetZu() { $("#sheet").hidden = true; $("#sheet").innerHTML = ""; if (profil && !$("#shell").hidden) render(); }
+function fachOptionen(sel) {
+  const namen = state.faecher.map(f => f.name);
+  for (const n of Object.keys(FACH_HUE)) if (!namen.includes(n)) namen.push(n);
+  if (sel && !namen.includes(sel)) namen.unshift(sel);
+  return namen.map(n => '<option value="' + esc(n) + '"' + (n === sel ? " selected" : "") + ">" + esc(n) + "</option>").join("");
+}
+function sheetHA(h) {
+  const neu = !h;
+  h = h || { id: uid(), fach: state.faecher[0] ? state.faecher[0].name : "Mathematik", titel: "", notiz: "", faellig: plusTage(heute(), 1), erledigt: false, erstellt: Date.now() };
+  sheet(neu ? "Neue Aufgabe" : "Aufgabe",
+    '<label class="f"><span>Was ist zu tun</span><input type="text" id="h-titel" value="' + esc(h.titel) + '" placeholder="Buch S. 42, Nr. 3 bis 7"></label>' +
+    '<div class="grid2"><label class="f"><span>Fach</span><select id="h-fach">' + fachOptionen(h.fach) + "</select></label>" +
+    '<label class="f"><span>Fällig am</span><input type="date" id="h-faellig" value="' + esc(h.faellig) + '"></label></div>' +
+    '<div class="btnrow">' + [1, 2, 7].map(n => '<button class="btn ghost small" data-act="hdatum" data-id="' + n + '">' + (n === 1 ? "Morgen" : n === 2 ? "Übermorgen" : "Nächste Woche") + "</button>").join("") + "</div>" +
+    '<label class="f"><span>Notiz</span><textarea id="h-notiz" rows="3" placeholder="Was genau, worauf achten">' + esc(h.notiz || "") + "</textarea></label>" +
+    (neu ? "" : '<button class="btn danger wide" data-act="haloeschen" data-id="' + h.id + '">' + svg("muell") + "Aufgabe löschen</button>"),
+    '<button class="btn ghost" data-act="sheetzu">Abbrechen</button><button class="btn" data-act="hspeichern" data-id="' + h.id + '">Speichern</button>');
+  window.__ha = h;
+  if (neu) setTimeout(() => { const el = $("#h-titel"); if (el) el.focus(); }, 60);
+}
+function sheetTest(t) {
+  const neu = !t;
+  t = t || { id: uid(), fach: state.faecher[0] ? state.faecher[0].name : "Mathematik", titel: "", datum: plusTage(heute(), 7), themen: [], karten: [], versuche: [], erstellt: Date.now() };
+  window.__test = t;
+  if (neu) return sheet("Test eintragen",
+    '<label class="f"><span>Fach</span><select id="t-fach">' + fachOptionen(t.fach) + "</select></label>" +
+    '<label class="f"><span>Thema der Arbeit</span><input type="text" id="t-titel" placeholder="Lineare Funktionen"></label>' +
+    '<label class="f"><span>Wann</span><input type="date" id="t-datum" value="' + esc(t.datum) + '"></label>' +
+    '<label class="f"><span>Themen, eins pro Zeile</span><textarea id="t-themen" rows="6" placeholder="Steigung berechnen&#10;Nullstellen bestimmen"></textarea></label>',
+    '<button class="btn ghost" data-act="sheetzu">Abbrechen</button><button class="btn" data-act="tspeichern" data-id="' + t.id + '">Anlegen</button>');
+  const d = tageBis(t.datum), s = testStand(t), faellig = (t.karten || []).filter(k => !k.due || k.due <= heute()).length;
+  const bcls = s == null ? "" : s < 40 ? " rot" : s < 75 ? " ocker" : " gruen";
+  let body = '<div class="card" style="padding:15px; display:flex; flex-direction:column; gap:10px">' +
+    '<div class="row"><span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + "</span>" +
+    '<span class="pill ' + (d < 0 ? "grau" : d <= 2 ? "rot" : d <= 5 ? "ocker" : "tinte") + '">' + (d < 0 ? "vorbei" : relTag(t.datum)) + "</span>" +
+    '<span class="dim sm mono" style="margin-left:auto">' + datumKurz(t.datum) + "</span></div>" +
+    (s != null ? '<div class="barrow"><span class="bar' + bcls + '"><i style="width:' + s + '%"></i></span><span class="pct">' + s + "%</span></div>" +
+      '<p class="sm dim">Dein Stand über alle Themen. ' + (t.karten || []).length + " Karten, davon " + faellig + " heute dran.</p>"
+      : '<p class="sm dim">' + ((t.karten || []).length ? (t.karten.length + " Karten, noch kein Stand. Üb einmal durch.") : "Noch keine Karteikarten.") + "</p>") + "</div>";
+  if (typeof t.note === "number") body += '<button class="card zeile" data-act="note" data-id="' + t.id + '">' +
+    '<span class="nm">Deine Note</span><span class="dim sm">' + ((t.gewicht || 1) === 2 ? "zählt doppelt" : "zählt einfach") + "</span>" +
+    '<span class="notegross" style="color:var(--' + notenGut(t.note) + ')">' + notenText(t.note) + "</span></button>";
+  else if (d < 0) body += '<button class="nudge warn" data-act="note" data-id="' + t.id + '">' + svg("stift") +
+    '<span class="tx"><b>Note eintragen</b><span class="p">Der Test ist vorbei. Mit der Note werden dein Schnitt und der Aufwand für die nächsten Arbeiten berechnet.</span></span></button>';
+  else body += aufwandBox(t, true);
+  body += '<div class="btnrow">' +
+    ((t.karten || []).length ? '<button class="btn" data-act="flash" data-id="' + t.id + '">' + svg("karte") + "Karten lernen</button>" : "") +
+    (SAMPLE ? '<button class="btn ' + ((t.karten || []).length ? "ghost" : "") + '" data-act="quizstart" data-id="' + t.id + '">' + svg("quiz") + "Quiz schreiben</button>" : "") +
+    (SAMPLE ? '<button class="btn ' + ((t.karten || []).length ? "ghost" : "soft") + '" data-act="kartenbauen" data-id="' + t.id + '">' + svg("funke") + ((t.karten || []).length ? "Mehr Karten" : "Karten erzeugen") + "</button>" : "") + "</div>";
+  if (SAMPLE) body += '<div class="btnrow"><button class="btn ghost" data-act="lernplan" data-id="' + t.id + '">' + svg("uhr") + "Lernplan</button>" +
+    '<button class="btn ghost" data-act="spick" data-id="' + t.id + '">' + svg("buch") + "Spickzettel</button></div>";
+  body += '<div><span class="lbl">Themen und dein Stand</span><ul class="stack-s" style="margin-top:8px">' +
+    ((t.themen || []).length ? t.themen.map((th, i) => {
+      const st = themaStand(t, th.titel);
+      return '<li class="card flat themacard"><div class="top2"><b>' + esc(th.titel) + "</b>" + standHTML(st) + "</div>" +
+        (th.stichpunkte && th.stichpunkte.length ? '<div class="sm muted">' + esc(th.stichpunkte.join(" · ")) + "</div>" : "") +
+        '<div class="btnrow">' + (SAMPLE ? '<button class="btn ghost small" data-act="erklaer" data-id="' + t.id + ":" + i + '">Erklär mir das</button>' : "") +
+        ((t.karten || []).some(k => k.thema === th.titel) ? '<button class="btn ghost small" data-act="flashthema" data-id="' + t.id + ":" + i + '">Nur diese Karten</button>' : "") + "</div></li>";
+    }).join("") : '<li class="empty">Keine Themen hinterlegt.</li>') + "</ul></div>";
+  if ((t.versuche || []).length) body += '<div><span class="lbl">Quiz-Ergebnisse</span><div class="card list" style="margin-top:8px">' +
+    t.versuche.slice(-5).reverse().map(v => '<div class="item" style="align-items:center"><span class="body"><span class="t mono">' + Math.round(v.punkte / v.gesamt * 100) + "%</span>" +
+      '<span class="note">' + v.punkte + " von " + v.gesamt + " · " + datumKurz(v.datum) + "</span></span></div>").join("") + "</div></div>";
+  body += '<div class="btnrow"><button class="btn ghost small" data-act="testbearbeiten" data-id="' + t.id + '">' + svg("stift") + "Bearbeiten</button>" +
+    '<button class="btn danger small" data-act="testloeschen" data-id="' + t.id + '">' + svg("muell") + "Test löschen</button></div>";
+  sheet(t.titel || t.fach, body, "");
+}
+function sheetTestEdit(t) {
+  window.__test = t;
+  sheet("Test bearbeiten",
+    '<label class="f"><span>Fach</span><select id="t-fach">' + fachOptionen(t.fach) + "</select></label>" +
+    '<label class="f"><span>Thema der Arbeit</span><input type="text" id="t-titel" value="' + esc(t.titel) + '"></label>' +
+    '<label class="f"><span>Wann</span><input type="date" id="t-datum" value="' + esc(t.datum) + '"></label>' +
+    '<label class="f"><span>Themen, eins pro Zeile</span><textarea id="t-themen" rows="7">' + esc((t.themen || []).map(x => x.titel).join("\n")) + "</textarea></label>" +
+    '<p class="sm dim">Schon erzeugte Karteikarten bleiben erhalten.</p>',
+    '<button class="btn ghost" data-act="zurtest">Abbrechen</button><button class="btn" data-act="tupdate" data-id="' + t.id + '">Speichern</button>', { zurueck: "zurtest" });
+}
+function sheetNudges() {
+  const n = nudges();
+  sheet("Was ansteht", n.length ? '<div class="stack-s">' + n.map(x => nudgeHTML(x, true)).join("") + "</div>" : '<div class="empty">Alles erledigt. Nichts steht an.</div>',
+    '<button class="btn wide" data-act="sheetzu">Schließen</button>');
+}
+
+/* ===================== Karteikarten ===================== */
+let flash = null;
+function flashStart(karten, titel) {
+  if (!karten.length) { toast("Keine Karten da."); return; }
+  flash = { karten: karten.slice().sort(() => Math.random() - .5), i: 0, auf: false, titel: titel, gut: 0, nochmal: 0 };
+  flashRender();
+}
+function flashRender() {
+  if (!flash) return;
+  if (flash.i >= flash.karten.length) {
+    markiereLerntag();
+    return sheet("Fertig", '<div class="card" style="padding:26px; text-align:center; display:flex; flex-direction:column; gap:10px">' +
+      '<span class="score" style="color:var(--gruen)">' + flash.gut + "</span><b>von " + flash.karten.length + " saßen sofort</b>" +
+      '<p class="sm muted">' + (flash.nochmal ? flash.nochmal + " Karten kommen bald wieder dran." : "Alles sitzt. Stark.") + "</p></div>",
+      '<button class="btn ghost" data-act="sheetzu">Schließen</button><button class="btn" data-act="flashwieder">Noch eine Runde</button>');
+  }
+  const k = flash.karten[flash.i];
+  sheet(flash.titel + " · " + (flash.i + 1) + "/" + flash.karten.length,
+    '<div class="progressdots">' + flash.karten.map((x, i) => '<i class="' + (i < flash.i ? "on" : i === flash.i ? "now" : "") + '"></i>').join("") + "</div>" +
+    '<button class="flash" data-act="flashdreh">' + (k.thema ? '<span class="lbl">' + esc(k.thema) + "</span>" : "") +
+    '<span class="q">' + esc(k.f) + "</span>" +
+    (flash.auf ? '<span class="a">' + esc(k.a) + "</span>" : '<span class="hint">Tippen zum Umdrehen</span>') + "</button>" +
+    (flash.auf && SAMPLE ? '<button class="btn ghost small" data-act="kartehilfe">' + svg("leicht") + "Verstehe ich nicht, erklär es</button>" : ""),
+    flash.auf ? '<button class="btn ghost" data-act="flashnochmal">Nochmal</button><button class="btn" data-act="flashgut">Wusste ich</button>'
+      : '<button class="btn wide" data-act="flashdreh">Antwort zeigen</button>');
+}
+async function flashBewerten(gut) {
+  const k = flash.karten[flash.i];
+  const t = state.tests.find(x => (x.karten || []).some(y => y.id === k.id));
+  if (t) {
+    const kk = t.karten.find(y => y.id === k.id);
+    if (kk) { kk.box = gut ? Math.min((kk.box || 1) + 1, 5) : 1; kk.due = plusTage(heute(), BOX_TAGE[kk.box]); kk.neu = false; await put("tests", t); }
+  }
+  if (gut) flash.gut++; else flash.nochmal++;
+  flash.i++; flash.auf = false; flashRender();
+}
+
+/* ===================== Quiz ===================== */
+let quiz = null;
+async function quizStart(t) {
+  if (!SAMPLE) { toast("Quiz braucht Claude."); return; }
+  const stand = testStand(t);
+  sheet("Quiz wird gebaut", '<div class="card" style="padding:26px; text-align:center"><span class="row" style="justify-content:center"><span class="spin"></span><b>Die Fragen werden geschrieben...</b></span>' +
+    '<p class="sm dim" style="margin-top:8px">Für Klasse ' + esc(profil.klasse) + ", " + (stand == null ? "erste Runde" : "Stand " + stand + "%") + ".</p></div>");
+  const themen = (t.themen || []).map(x => "- " + x.titel + (x.stichpunkte && x.stichpunkte.length ? ": " + x.stichpunkte.join("; ") : "")).join("\n");
+  const schwach = schwacheThemen(t);
+  const p = "Du bist Lehrkraft und schreibst ein Übungsquiz für eine Klassenarbeit. " + lernkontext() + "\n" +
+    "Fach: " + t.fach + "\nThema der Arbeit: " + t.titel + "\nLernziele:\n" + themen + "\n" +
+    (schwach.length ? "Hier ist der Lernende noch unsicher, stelle dazu mehr Fragen: " + schwach.join(", ") + "\n" : "") +
+    frageAnweisung(stand) + "\n" +
+    "Schreibe 8 Multiple-Choice-Fragen, jede mit genau 4 Antworten und nur einer richtigen. Mische die richtige Antwort zufällig auf die Positionen. Die Erklärung ist ein kurzer Satz. Das Feld thema muss wörtlich einem der Lernziele oben entsprechen.\n" +
+    'Antworte nur mit JSON: {"fragen":[{"frage":"...","optionen":["...","...","...","..."],"richtig":0,"erklaerung":"...","thema":"..."}]}';
+  try {
+    const erg = await SAMPLE.json(p, { modelTier: "complex" });
+    const fragen = (erg && erg.fragen ? erg.fragen : []).filter(f => f && f.frage && Array.isArray(f.optionen) && f.optionen.length >= 2);
+    if (!fragen.length) throw { code: "invalid_json" };
+    quiz = { t: t, fragen: fragen, i: 0, wahl: null, punkte: 0, falsch: [], proThema: {} };
+    quizRender();
+  } catch (e) { sampleFehler(e, () => quizStart(t)); }
+}
+function schwacheThemen(t) {
+  const z = {};
+  for (const th of (t.themen || [])) { const s = themaStand(t, th.titel); if (s != null && s < 50) z[th.titel] = 100 - s; }
+  return Object.keys(z).sort((a, b) => z[b] - z[a]).slice(0, 3);
+}
+function quizRender() {
+  if (!quiz) return;
+  if (quiz.i >= quiz.fragen.length) return quizEnde();
+  const f = quiz.fragen[quiz.i], B = ["A", "B", "C", "D", "E"];
+  const opts = f.optionen.map((o, i) => {
+    let cls = "";
+    if (quiz.wahl != null) cls = (i === f.richtig) ? " right" : (i === quiz.wahl ? " wrong" : "");
+    return '<button class="qopt' + cls + '"' + (quiz.wahl != null ? " disabled" : "") + ' data-act="quizwahl" data-id="' + i + '">' +
+      '<span class="k">' + B[i] + "</span><span>" + esc(o) + "</span></button>";
+  }).join("");
+  const richtig = quiz.wahl === f.richtig;
+  sheet("Frage " + (quiz.i + 1) + " von " + quiz.fragen.length,
+    '<div class="bar"><i style="width:' + Math.round(quiz.i / quiz.fragen.length * 100) + '%"></i></div>' +
+    (f.thema ? '<span class="lbl">' + esc(f.thema) + "</span>" : "") +
+    '<h3 style="font-size:1.12rem; line-height:1.35">' + esc(f.frage) + "</h3>" +
+    '<div class="stack-s">' + opts + "</div>" +
+    (quiz.wahl != null && f.erklaerung ? '<div class="nudge ' + (richtig ? "" : "warn") + '">' + svg(richtig ? "check" : "funke") +
+      '<span class="tx"><b>' + (richtig ? "Richtig" : "Nicht ganz") + '</b><span class="p">' + esc(f.erklaerung) + "</span></span></div>" : "") +
+    (quiz.wahl != null && !richtig && SAMPLE ? '<button class="btn ghost small" data-act="quizhilfe">' + svg("leicht") + "Erklär mir das genauer</button>" : ""),
+    quiz.wahl != null ? '<button class="btn wide" data-act="quizweiter">' + (quiz.i + 1 >= quiz.fragen.length ? "Auswertung" : "Weiter") + "</button>" : "");
+}
+async function quizEnde() {
+  const t = quiz.t, ges = quiz.fragen.length, p = quiz.punkte, pct = Math.round(p / ges * 100);
+  const echt = state.tests.find(x => x.id === t.id);
+  if (echt) {
+    echt.versuche = (echt.versuche || []).concat([{ datum: heute(), punkte: p, gesamt: ges, falsch: quiz.falsch, proThema: quiz.proThema }]).slice(-20);
+    for (const k of (echt.karten || [])) if (quiz.falsch.includes(k.thema)) { k.box = 1; k.due = heute(); }
+    await put("tests", echt);
+  }
+  markiereLerntag();
+  const wort = pct >= 90 ? "Sitzt." : pct >= 70 ? "Fast da." : pct >= 50 ? "Halbe Miete." : "Da geht noch was.";
+  const falschUniq = quiz.falsch.filter((x, i, a) => x && a.indexOf(x) === i);
+  const zt = echt || t;
+  sheet("Auswertung",
+    '<div class="card" style="padding:26px; text-align:center; display:flex; flex-direction:column; gap:8px">' +
+    '<span class="score" style="color:' + (pct >= 70 ? "var(--gruen)" : pct >= 50 ? "var(--ocker)" : "var(--rot)") + '">' + pct + "%</span>" +
+    "<b>" + p + " von " + ges + ' richtig</b><p class="muted">' + wort + "</p></div>" +
+    (falschUniq.length ? '<div><span class="lbl">Das solltest du nochmal ansehen</span><div class="card list" style="margin-top:8px">' +
+      falschUniq.map(th => {
+        const i = (zt.themen || []).findIndex(x => x.titel === th);
+        return '<button class="item" ' + (i >= 0 ? 'data-act="erklaer" data-id="' + zt.id + ":" + i + '"' : "") + '>' +
+          '<span class="body"><span class="t">' + esc(th) + '</span><span class="note">Antippen und du bekommst es erklärt</span></span></button>';
+      }).join("") + '</div><p class="kbdhint" style="margin-top:8px">Die passenden Karteikarten sind wieder auf Anfang gesetzt.</p></div>' : "") +
+    (pct < 50 ? '<div class="hilfe">Das war viel auf einmal. Die Themen werden dir ab jetzt einfacher erklärt.</div>' : ""),
+    '<button class="btn ghost" data-act="sheetzu">Schließen</button>' +
+    ((echt && (echt.karten || []).length) ? '<button class="btn" data-act="flash" data-id="' + t.id + '">Karten üben</button>'
+      : '<button class="btn" data-act="quizstart" data-id="' + t.id + '">Neues Quiz</button>'));
+  if (pct < 50) merkeEinfacher();
+  quiz = null;
+}
+/* ===================== Claude ===================== */
+function sampleFehler(e, retry) {
+  const c = e && e.code;
+  const m = {
+    not_granted: "Du hast Claude für diese Seite nicht erlaubt.",
+    rate_limited: "Zu viele Anfragen kurz hintereinander. Warte einen Moment.",
+    images_unavailable: "Bilder gehen in dieser Ansicht nicht. Nimm Text abtippen.",
+    image_rejected: "Das Bild war nicht lesbar. Nochmal, näher dran und heller.",
+    invalid_json: "Die Antwort war unbrauchbar. Versuch es nochmal oder kürze den Text.",
+    cancelled: "Abgebrochen.", too_long: "Zu viel Text auf einmal. Teil es auf."
+  }[c] || "Das hat gerade nicht geklappt.";
+  window.__retry = retry;
+  sheet("Hat nicht geklappt", '<div class="nudge alarm">' + svg("funke") + '<span class="tx"><b>' + esc(m) + '</b><span class="p">' + (c ? "Fehlercode: " + esc(c) : "") + "</span></span></div>",
+    '<button class="btn ghost" data-act="sheetzu">Schließen</button>' + (retry ? '<button class="btn" data-act="retry">Nochmal</button>' : ""));
+}
+async function bildVerkleinern(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const max = 1600, sk = Math.min(1, max / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * sk); c.height = Math.round(img.height * sk);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return (await new Promise(r => c.toBlob(r, "image/jpeg", .86))) || file;
+  } catch (e) { return file; } finally { URL.revokeObjectURL(url); }
+}
+async function bilderWaehlen(kamera, sofort) {
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = (SAMPLE_LIMITS && SAMPLE_LIMITS.images && SAMPLE_LIMITS.images.mediaTypes.join(",")) || "image/*";
+  if (kamera) inp.setAttribute("capture", "environment"); else inp.multiple = true;
+  // Safari auf dem iPad öffnet die Auswahl nur, wenn das Feld wirklich im Dokument steht.
+  inp.style.cssText = "position:fixed; left:-9999px; top:0; width:1px; height:1px; opacity:0";
+  document.body.appendChild(inp);
+  const aufraeumen = () => { setTimeout(() => { if (inp.parentNode) inp.remove(); }, 600); };
+  window.addEventListener("focus", aufraeumen, { once: true });
+  inp.onchange = async () => {
+    const files = Array.from(inp.files || []);
+    if (!files.length) { aufraeumen(); return; }
+    const maxN = (SAMPLE_LIMITS && SAMPLE_LIMITS.images && SAMPLE_LIMITS.images.maxCount) || 1;
+    const sc = (ui.scan && ui.scan.phase === "bilder") ? ui.scan : { phase: "bilder", blobs: [], urls: [] };
+    for (const f of files) {
+      if (sc.blobs.length >= maxN) break;
+      const b = await bildVerkleinern(f);
+      sc.blobs.push(b); sc.urls.push(URL.createObjectURL(b));
+    }
+    ui.scan = sc; ui.tab = "scan"; render();
+    aufraeumen();
+    if (sofort) scanLesen(sc.blobs, null);
+  };
+  inp.click();
+}
+async function scanLesen(bilder, text) {
+  ui.scan = { phase: "laeuft", info: bilder ? "Das Bild wird gelesen..." : "Der Text wird gelesen..." };
+  render();
+  const p = "Du hilfst einem Schüler in Deutschland. " + lernkontext() + "\n" +
+    (bilder ? "Auf den Bildern steht etwas aus der Schule: ein Lernzielkatalog, ein Arbeitsblatt, ein Tafelbild, eine Ankündigung oder eine Hausaufgabenliste. Lies alles, was du erkennen kannst."
+      : "Hier ist ein Text aus der Schule:\n\n" + text) +
+    "\n\nHeute ist der " + heute() + ".\n" +
+    "Entscheide zuerst, worum es geht. Wenn es um eine Klassenarbeit, einen Test oder eine Prüfung mit Lernzielen geht, ist art gleich test. Wenn es einzelne Hausaufgaben mit Abgabeterminen sind, ist art gleich hausaufgaben.\n" +
+    'Bei art test antworte so: {"art":"test","fach":"Mathematik","titel":"Lineare Funktionen","datum":"2026-09-25","themen":[{"titel":"Steigung berechnen","stichpunkte":["Steigungsdreieck","m aus zwei Punkten"]}]}\n' +
+    'Bei art hausaufgaben antworte so: {"art":"hausaufgaben","aufgaben":[{"fach":"Mathematik","titel":"Buch S. 42, Nr. 3 bis 7","faellig":"2026-09-15","notiz":""}]}\n' +
+    "Fasse beim Test zusammengehörige Punkte zu einem Thema zusammen und gib je Thema ein paar Stichpunkte. Schreib alles auf Deutsch. Ohne erkennbares Datum setze datum auf null, bei Hausaufgaben nimm dann morgen. Fächer immer ausgeschrieben. Antworte nur mit JSON.";
+  try {
+    const opts = { modelTier: "complex" };
+    if (bilder) opts.images = bilder;
+    const e = await SAMPLE.json(p, opts);
+    if (e && e.art === "hausaufgaben" && Array.isArray(e.aufgaben) && e.aufgaben.length) {
+      const auf = e.aufgaben.filter(a => a && a.titel).map(a => ({
+        fach: String(a.fach || "Allgemein"), titel: String(a.titel).trim(), notiz: String(a.notiz || ""),
+        faellig: /^\d{4}-\d{2}-\d{2}$/.test(a.faellig || "") ? a.faellig : plusTage(heute(), 1)
+      }));
+      ui.scan = { phase: "fertig", erg: { art: "hausaufgaben", aufgaben: auf } };
+      return render();
+    }
+    const themen = (e && Array.isArray(e.themen) ? e.themen : []).map(t => ({
+      titel: String((t && t.titel) || "").trim(),
+      stichpunkte: Array.isArray(t && t.stichpunkte) ? t.stichpunkte.map(String) : []
+    })).filter(t => t.titel);
+    if (!themen.length) throw { code: "invalid_json" };
+    let datum = e.datum && /^\d{4}-\d{2}-\d{2}$/.test(e.datum) ? e.datum : "";
+    if (datum && tageBis(datum) < 0) datum = "";
+    ui.scan = { phase: "fertig", erg: { art: "test", fach: String(e.fach || "Allgemein"), titel: String(e.titel || "Klassenarbeit"), datum: datum, themen: themen } };
+    render();
+  } catch (e) {
+    ui.scan = bilder ? { phase: "bilder", blobs: (ui.scan && ui.scan.blobs) || [], urls: (ui.scan && ui.scan.urls) || [] } : { phase: "text", text: text };
+    if (ui.scan.phase === "bilder" && !ui.scan.blobs.length) ui.scan = { phase: "leer" };
+    render(); sampleFehler(e, () => scanLesen(bilder, text));
+  }
+}
+async function kartenBauen(t) {
+  if (!SAMPLE) return;
+  sheet("Karteikarten", '<div class="card" style="padding:26px; text-align:center"><span class="row" style="justify-content:center"><span class="spin"></span><b>Die Karteikarten werden geschrieben...</b></span></div>');
+  const themen = (t.themen || []).map(x => "- " + x.titel + (x.stichpunkte && x.stichpunkte.length ? ": " + x.stichpunkte.join("; ") : "")).join("\n");
+  const vorhanden = (t.karten || []).map(k => k.f).slice(0, 40);
+  const stand = testStand(t);
+  const p = "Du machst Karteikarten für eine Klassenarbeit. " + lernkontext() + "\n" +
+    "Fach: " + t.fach + "\nThema: " + t.titel + "\nLernziele:\n" + themen + "\n" +
+    (vorhanden.length ? "Diese Fragen gibt es schon, stelle andere:\n" + vorhanden.join("\n") + "\n" : "") +
+    (stufeNummer(stand) === 0 ? "Halte die Antworten kurz und sehr einfach, höchstens zwei kurze Sätze, keine Fachwörter ohne Erklärung.\n" : "") +
+    "Schreibe 14 Karteikarten. Die Frage ist kurz und konkret, die Antwort ein bis drei Sätze, die man sich merken kann. Verteile die Karten gleichmäßig auf die Themen. Das Feld thema muss wörtlich einem der Lernziele oben entsprechen.\n" +
+    'Antworte nur mit JSON: {"karten":[{"frage":"...","antwort":"...","thema":"..."}]}';
+  try {
+    const e = await SAMPLE.json(p, { modelTier: "complex" });
+    const neue = (e && e.karten ? e.karten : []).filter(k => k && k.frage && k.antwort)
+      .map(k => ({ id: uid(), f: String(k.frage), a: String(k.antwort), thema: String(k.thema || ""), box: 1, due: heute(), neu: true }));
+    if (!neue.length) throw { code: "invalid_json" };
+    t.karten = (t.karten || []).concat(neue);
+    await put("tests", t);
+    toast(neue.length + " Karten sind da.");
+    sheetTest(state.tests.find(x => x.id === t.id) || t);
+  } catch (e) { sampleFehler(e, () => kartenBauen(t)); }
+}
+async function erklaerThema(t, i, extraEinfach) {
+  const th = (t.themen || [])[i];
+  if (!th || !SAMPLE) return;
+  const stand = themaStand(t, th.titel);
+  let text = "";
+  const zeig = () => sheet(th.titel,
+    '<div class="row"><span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + "</span>" + standHTML(stand) +
+    '<span class="pill grau">' + (extraEinfach ? "ganz einfach" : "Klasse " + esc(profil.klasse)) + "</span></div>" +
+    '<div class="aitext" id="erkl">' + (text ? esc(text) : '<span class="row"><span class="spin"></span><span class="dim">Wird geschrieben...</span></span>') + "</div>" +
+    (text ? '<div class="hilfe">Hat das geholfen?</div>' : ""),
+    '<button class="btn ghost" data-act="sheetzu">Schließen</button>' +
+    (text && !extraEinfach ? '<button class="btn ghost" data-act="nocheinfacher" data-id="' + t.id + ":" + i + '">' + svg("leicht") + "Einfacher</button>" : "") +
+    (text ? '<button class="btn" data-act="flashthema" data-id="' + t.id + ":" + i + '">Karten dazu</button>' : ""),
+    { zurueck: "zurtest" });
+  window.__test = t;
+  zeig();
+  const p = "Erkläre einem Schüler ein Thema für eine Klassenarbeit. " + lernkontext() + "\n" +
+    "Fach: " + t.fach + "\nThema: " + th.titel + (th.stichpunkte && th.stichpunkte.length ? "\nStichpunkte: " + th.stichpunkte.join("; ") : "") + "\n" +
+    (stand != null ? "Sein bisheriger Stand bei diesem Thema liegt bei " + stand + " von 100.\n" : "") +
+    erklaerAnweisung(stand, extraEinfach) + "\n\n" +
+    "Struktur: erst in zwei Sätzen worum es geht, dann die wichtigsten Punkte als kurze Liste mit Bindestrichen, dann ein konkretes Beispiel, dann unter der Zeile Typische Fehler zwei Stolperfallen, zum Schluss ein Merksatz in einer Zeile. Höchstens 250 Wörter. Kein Markdown mit Sternchen, nur Text und Bindestriche.";
+  try {
+    const r = await SAMPLE(p, { modelTier: "default", onText: ({ text: t2 }) => { text = t2; const el = document.getElementById("erkl"); if (el) el.textContent = t2; } });
+    text = r.text; zeig(); markiereLerntag();
+  } catch (e) { sampleFehler(e, () => erklaerThema(t, i, extraEinfach)); }
+}
+async function kurzHilfe(titel, frage, antwort, zurueckFn) {
+  let text = "";
+  const zeig = () => sheet("Einfacher erklärt",
+    '<div class="card flat" style="padding:13px"><b style="font-weight:600; font-size:.95rem">' + esc(frage) + "</b></div>" +
+    '<div class="aitext" id="erkl">' + (text ? esc(text) : '<span class="row"><span class="spin"></span><span class="dim">Wird geschrieben...</span></span>') + "</div>",
+    '<button class="btn wide" data-act="hilfezurueck">Zurück</button>');
+  window.__hilfeZurueck = zurueckFn;
+  zeig();
+  const p = "Ein Schüler kommt bei einer Lernfrage nicht weiter. " + lernkontext() + "\n" +
+    "Fach oder Thema: " + titel + "\nFrage: " + frage + "\nRichtige Antwort: " + antwort + "\n\n" +
+    erklaerAnweisung(0, true) + "\nErkläre in höchstens 120 Wörtern, warum die Antwort stimmt, und gib eine Eselsbrücke oder einen Merksatz dazu. Kein Markdown.";
+  try {
+    const r = await SAMPLE(p, { modelTier: "default", onText: ({ text: t2 }) => { text = t2; const el = document.getElementById("erkl"); if (el) el.textContent = t2; } });
+    text = r.text; zeig(); merkeEinfacher();
+  } catch (e) { sampleFehler(e, null); }
+}
+async function lernplan(t) {
+  if (!SAMPLE) return;
+  const d = tageBis(t.datum);
+  let text = "";
+  window.__test = t;
+  const zeig = () => sheet("Lernplan",
+    '<div class="row"><span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + '</span><span class="pill tinte">' + (d <= 0 ? "heute" : "noch " + d + (d === 1 ? " Tag" : " Tage")) + "</span></div>" +
+    '<div class="aitext" id="erkl">' + (text ? esc(text) : '<span class="row"><span class="spin"></span><span class="dim">Der Plan entsteht...</span></span>') + "</div>",
+    '<button class="btn wide" data-act="sheetzu">Schließen</button>', { zurueck: "zurtest" });
+  zeig();
+  const staende = (t.themen || []).map(th => { const s = themaStand(t, th.titel); return "- " + th.titel + (s != null ? " (Stand " + s + " von 100)" : " (noch nicht geübt)"); }).join("\n");
+  const p = "Mach einen Lernplan für einen Schüler. " + lernkontext() + "\n" +
+    "Fach: " + t.fach + "\nArbeit: " + t.titel + "\nHeute: " + heute() + "\nArbeit am: " + t.datum + " (in " + d + " Tagen)\nThemen mit Stand:\n" + staende + "\n\n" +
+    "Verteile die Themen auf die verbleibenden Tage, ungefähr 20 bis 30 Minuten pro Tag. Themen mit niedrigem Stand kommen früher und öfter dran. Der Tag vor der Arbeit ist nur zum Wiederholen. " +
+    "Schreibe pro Tag eine Zeile in der Form: Wochentag und Tag.Monat, dann ein Bindestrich, dann was zu tun ist. Keine Einleitung, nur der Plan.";
+  try {
+    const r = await SAMPLE(p, { modelTier: "default", onText: ({ text: t2 }) => { text = t2; const el = document.getElementById("erkl"); if (el) el.textContent = t2; } });
+    text = r.text; zeig();
+  } catch (e) { sampleFehler(e, () => lernplan(t)); }
+}
+async function quickAdd(roh) {
+  if (!roh.trim()) return;
+  if (!SAMPLE) return sheetHA(null);
+  toast("Wird erkannt...");
+  const p = "Ein Schüler tippt eine Hausaufgabe schnell hin. Zerlege sie.\nEingabe: " + roh + "\nHeute ist " + heute() + " (" + WD[new Date().getDay()] + ").\n" +
+    "Bekannte Fächer: " + (state.faecher.map(f => f.name).join(", ") || Object.keys(FACH_HUE).join(", ")) + "\n" +
+    "Erkenne das Fach voll ausgeschrieben, einen kurzen klaren Titel und das Fälligkeitsdatum. Wochentage meinen immer den nächsten kommenden. Ohne Angabe nimm morgen.\n" +
+    'Antworte nur mit JSON: {"fach":"Mathematik","titel":"Buch S. 42, Nr. 3 bis 7","faellig":"2026-09-12"}';
+  let h;
+  try {
+    const e = await SAMPLE.json(p, { modelTier: "quick" });
+    h = { id: uid(), fach: String(e.fach || "Allgemein"), titel: String(e.titel || roh).trim(), notiz: "", faellig: /^\d{4}-\d{2}-\d{2}$/.test(e.faellig || "") ? e.faellig : plusTage(heute(), 1), erledigt: false, erstellt: Date.now() };
+    fachSichern(h.fach);
+  } catch (e) {
+    h = { id: uid(), fach: "Allgemein", titel: roh.trim(), notiz: "", faellig: plusTage(heute(), 1), erledigt: false, erstellt: Date.now() };
+  }
+  await put("hausaufgaben", h);
+  const el = document.getElementById("quick"); if (el) el.value = "";
+  toast(h.fach + " · " + relTag(h.faellig));
+}
+/* ===================== Einstellungen ===================== */
+function sheetSettings() {
+  const st = streakTage();
+  const stufe = state.cfg.erklaerstufe || "auto";
+  const theme = state.cfg.theme || "system";
+  sheet("Profil und Einstellungen",
+    '<div class="card" style="padding:16px; display:flex; align-items:center; gap:14px">' +
+    '<span class="avatar big" style="--h:' + profil.h + '">' + esc(profZeichen(profil)) + "</span>" +
+    '<span style="flex:1; min-width:0"><b style="font-family:var(--disp); font-size:1.15rem">' + esc(profName(profil)) + "</b><br>" +
+    '<span class="sm dim">' + esc(profil.schulform) + (profil.land ? " · " + esc(profil.land) : "") + "</span></span></div>" +
+    '<div class="btnrow"><button class="btn ghost small" data-act="sprofil">' + svg("stift") + "Profil ändern</button>" +
+    (SRV ? '<button class="btn ghost small" data-act="wpasswort">' + svg("schloss") + "Passwort ändern</button>"
+      : '<button class="btn ghost small" data-act="spin">' + svg("schloss") + (profil.pin ? "PIN ändern" : "PIN setzen") + "</button>") +
+    '<button class="btn ghost small" data-act="abmelden">' + svg("raus") + "Abmelden</button></div>" +
+
+    '<div><span class="lbl">Wie soll erklärt werden</span>' +
+    '<div class="seg" style="margin-top:7px">' +
+    [["einfach", "Ganz einfach"], ["auto", "Automatisch"], ["tief", "Ausführlich"]].map(x =>
+      '<button data-act="sstufe" data-id="' + x[0] + '" aria-pressed="' + (stufe === x[0]) + '">' + x[1] + "</button>").join("") + "</div>" +
+    '<p class="sm muted" style="margin-top:8px">' +
+    (stufe === "auto" ? "Es wird mitgezählt, wie deine Quizze und Karteikarten laufen. Bei einem Thema, das noch wackelt, wird einfacher erklärt und leichter gefragt. Sitzt ein Thema, wird es anspruchsvoller."
+      : stufe === "einfach" ? "Immer kurze Sätze, jedes Fachwort erklärt, ein Beispiel aus dem Alltag."
+        : "Es geht tiefer, mit Sonderfällen und typischen Prüfungsfragen.") + "</p></div>" +
+
+    '<div><span class="lbl">Darstellung</span><div class="seg" style="margin-top:7px">' +
+    [["system", "System"], ["light", "Hell"], ["dark", "Dunkel"]].map(x =>
+      '<button data-act="stheme" data-id="' + x[0] + '" aria-pressed="' + (theme === x[0]) + '">' + x[1] + "</button>").join("") + "</div></div>" +
+
+    '<div><span class="lbl">Bereiche</span><div class="card list" style="margin-top:8px">' +
+    '<button class="item" data-act="ziele"><span class="body"><span class="t">Noten und Ziele</span><span class="note">' +
+    (gesamtSchnitt() != null ? "Schnitt " + notenText(gesamtSchnitt()) : "noch keine Noten") +
+    (Object.keys(state.cfg.ziele || {}).length ? " · " + Object.keys(state.cfg.ziele).length + " Ziele" : "") + "</span></span></button>" +
+    '<button class="item" data-act="sfaecher"><span class="body"><span class="t">Fächer und Farben</span><span class="note">' + state.faecher.length + " Fächer</span></span></button>" +
+    '<button class="item" data-act="splan"><span class="body"><span class="t">Stundenplan</span><span class="note">' + state.plan.length + " Stunden eingetragen</span></span></button>" +
+    '<button class="item" data-act="sbenachr"><span class="body"><span class="t">Erinnerungen</span><span class="note">' + erlaubnisText() + "</span></span></button>" +
+    "</div></div>" +
+
+    '<div><span class="lbl">Deine Zahlen</span><div class="card" style="padding:14px; margin-top:8px; display:flex; gap:20px; flex-wrap:wrap">' +
+    [["Lernserie", st + (st === 1 ? " Tag" : " Tage")], ["Offen", offeneHA().length], ["Tests", state.tests.length],
+    ["Karten", state.tests.reduce((n, t) => n + (t.karten || []).length, 0)]]
+      .map(x => '<div><div class="lbl">' + x[0] + '</div><div style="font-family:var(--disp); font-size:1.3rem; font-weight:700">' + x[1] + "</div></div>").join("") + "</div>" +
+    '<div class="card" style="padding:14px; margin-top:8px"><span class="lbl">Die letzten 14 Tage</span>' +
+    '<div class="streifen" style="margin-top:9px">' + (() => {
+      const l = state.cfg.streak || [], out = [];
+      for (let i = 13; i >= 0; i--) { const d = plusTage(heute(), -i); out.push('<i class="' + (l.indexOf(d) >= 0 ? "an" : "") + (i === 0 ? " heute" : "") + '" title="' + datumKurz(d) + '"></i>'); }
+      return out.join("");
+    })() + "</div>" +
+    '<p class="sm dim" style="margin-top:8px">Jeder Balken ist ein Tag, an dem du gelernt oder etwas abgehakt hast.</p></div></div>' +
+
+    '<div><span class="lbl">Daten</span><div class="btnrow" style="margin-top:8px">' +
+    (DL ? '<button class="btn ghost small" data-act="backup">' + svg("download") + "Sicherung laden</button>" : "") +
+    '<button class="btn ghost small" data-act="beispielweg">Beispieldaten entfernen</button>' +
+    '<button class="btn danger small" data-act="alterweg">Erledigtes aufräumen</button></div>' +
+    '<p class="sm dim" style="margin-top:8px">' + (SRV ? "Deine Daten liegen auf dem Server und sind auf jedem Gerät gleich, sobald du angemeldet bist."
+      : DB ? "Deine Daten liegen in deinem Claude-Konto und sind auf jedem Gerät gleich."
+        : "Diese Ansicht speichert nur auf diesem Gerät.") + "</p></div>" +
+    '<div><span class="lbl">Auf dem iPad</span><p class="sm muted" style="margin-top:6px">Teilen-Knopf in Safari, dann <b>Zum Home-Bildschirm</b>. Danach startet sie wie eine App.</p></div>',
+    '<button class="btn wide" data-act="sheetzu">Fertig</button>');
+}
+function sheetProfilEdit() {
+  sheet("Profil ändern",
+    '<label class="f"><span>Bezeichnung, freiwillig</span><input type="text" id="pe-name" value="' + esc(profil.name || "") + '" placeholder="leer lassen ist auch gut"></label>' +
+    '<div><span class="lbl">Klassenstufe</span><div class="optgrid" style="margin-top:7px">' +
+    KLASSEN.map(k => '<button data-act="peklasse" data-id="' + k + '" aria-pressed="' + (String(profil.klasse) === k) + '">' + k + "</button>").join("") + "</div></div>" +
+    '<label class="f"><span>Schulform</span><select id="pe-schulform">' + SCHULFORMEN.map(x => '<option' + (x === profil.schulform ? " selected" : "") + ">" + x + "</option>").join("") + "</select></label>" +
+    '<label class="f"><span>Bundesland</span><select id="pe-land"><option value="">keine Angabe</option>' + LAENDER.map(x => '<option' + (x === profil.land ? " selected" : "") + ">" + x + "</option>").join("") + "</select></label>" +
+    '<div><span class="lbl">Farbe</span><div class="optgrid" style="margin-top:7px">' +
+    [214, 352, 26, 146, 264, 186, 318, 40].map(h => '<button data-act="pefarbe" data-id="' + h + '" aria-pressed="' + (profil.h === h) + '" aria-label="Farbe" style="background:hsl(' + h + ' 60% 55%); border-color:hsl(' + h + ' 60% 45%); width:44px; min-width:44px; padding:0"></button>').join("") + "</div></div>" +
+    (SRV ? '<button class="btn danger wide" data-act="walleweg">' + svg("muell") + "Alle meine Daten löschen</button>"
+      : profile.length > 1 ? '<button class="btn danger wide" data-act="profloeschen">' + svg("muell") + "Dieses Profil löschen</button>" : ""),
+    '<button class="btn ghost" data-act="settings">Abbrechen</button><button class="btn" data-act="pespeichern">Speichern</button>', { zurueck: "settings" });
+}
+function erlaubnisText() {
+  if (typeof Notification === "undefined") return "im Browser hier nicht möglich";
+  if (Notification.permission === "granted") return "eingeschaltet";
+  if (Notification.permission === "denied") return "vom Browser blockiert";
+  return "noch nicht erlaubt";
+}
+async function benachrAnfragen() {
+  if (typeof Notification === "undefined") { toast("Dieser Browser lässt das nicht zu."); return; }
+  try {
+    const r = await Notification.requestPermission();
+    toast(r === "granted" ? "Erinnerungen sind an." : "Nicht erlaubt. Du wirst stattdessen in der App erinnert.");
+  } catch (e) { toast("Ging nicht. Du wirst stattdessen in der App erinnert."); }
+  sheetBenachr();
+}
+function pruefeErinnerung() {
+  if (typeof Notification === "undefined" || Notification.permission !== "granted" || !profil) return;
+  const h = heute();
+  if (state.cfg.letzterCheck === h) return;
+  const n = nudges();
+  if (!n.length) return;
+  state.cfg.letzterCheck = h; putApp("cfg");
+  try { new Notification(n[0].titel, { body: n[0].text }); } catch (e) { }
+}
+function sheetBenachr() {
+  sheet("Erinnerungen",
+    '<button class="tick card" data-act="benachrfrage" aria-pressed="' + (typeof Notification !== "undefined" && Notification.permission === "granted") + '">' +
+    '<span class="sw"></span><span style="flex:1"><b style="font-weight:600">Meldungen vom Browser</b><br><span class="sm dim">' + erlaubnisText() + "</span></span></button>" +
+    '<p class="sm muted">Safari auf dem iPad zeigt Meldungen nur, wenn du die Seite vorher über Teilen und <b>Zum Home-Bildschirm</b> installiert hast. Solange wirst du beim Öffnen erinnert: über die Glocke oben, die Zahlen auf den Tabs und den Bereich Jetzt dran.</p>' +
+    '<div><span class="lbl">Das steht gerade an</span><div class="stack-s" style="margin-top:8px">' +
+    (nudges().length ? nudges().map(n => nudgeHTML(n, false)).join("") : '<div class="empty">Nichts offen.</div>') + "</div></div>",
+    '<button class="btn wide" data-act="settings">Zurück</button>', { zurueck: "settings" });
+}
+function sheetFaecher() {
+  sheet("Fächer",
+    '<div class="card list">' + (state.faecher.length ? state.faecher.map((f, i) =>
+      '<div class="item" style="align-items:center"><span class="dot" style="--h:' + f.h + '; width:14px; height:14px"></span>' +
+      '<span class="body"><span class="t">' + esc(f.name) + "</span></span>" +
+      '<input type="range" min="0" max="350" step="10" value="' + f.h + '" data-act="fachhue" data-id="' + i + '" style="width:84px; min-height:0" aria-label="Farbe ' + esc(f.name) + '">' +
+      '<button class="iconbtn" data-act="fachweg" data-id="' + i + '" aria-label="Fach entfernen">' + svg("muell") + "</button></div>").join("")
+      : '<div class="empty">Noch keine Fächer.</div>') + "</div>" +
+    '<div class="split"><input type="text" id="neuesfach" placeholder="Neues Fach" list="fachliste">' +
+    '<datalist id="fachliste">' + Object.keys(FACH_HUE).map(n => '<option value="' + esc(n) + '">').join("") + "</datalist>" +
+    '<button class="btn" data-act="fachneu" style="flex:0 0 auto" aria-label="Fach hinzufügen">' + svg("plus") + "</button></div>",
+    '<button class="btn wide" data-act="settings">Zurück</button>', { zurueck: "settings" });
+}
+function sheetPlan() {
+  const tage = [1, 2, 3, 4, 5];
+  sheet("Stundenplan",
+    tage.map(tg => {
+      const l = state.plan.filter(s => s.tag === tg).sort((a, b) => String(a.von).localeCompare(String(b.von)));
+      return '<div><span class="lbl">' + WD[tg] + '</span><div class="card list" style="margin-top:6px">' +
+        (l.length ? l.map(s => '<div class="slot"><span class="rule" style="--h:' + hueVon(s.fach) + '"></span><span class="time">' + esc(s.von) + "</span>" +
+          '<span style="flex:1">' + esc(s.fach) + (s.raum ? ' <span class="dim sm">' + esc(s.raum) + "</span>" : "") + "</span>" +
+          '<button class="iconbtn" data-act="slotweg" data-id="' + s.id + '" aria-label="Stunde entfernen">' + svg("muell") + "</button></div>").join("")
+          : '<div class="item dim sm" style="padding:10px 14px">frei</div>') + "</div></div>";
+    }).join("") +
+    '<div class="card" style="padding:14px; display:flex; flex-direction:column; gap:10px"><span class="lbl">Stunde hinzufügen</span>' +
+    '<div class="grid2"><label class="f"><span>Tag</span><select id="p-tag">' + tage.map(t => '<option value="' + t + '">' + WD[t] + "</option>").join("") + "</select></label>" +
+    '<label class="f"><span>Fach</span><select id="p-fach">' + fachOptionen(state.faecher[0] && state.faecher[0].name) + "</select></label></div>" +
+    '<div class="grid2"><label class="f"><span>Von</span><input type="time" id="p-von" value="08:00"></label>' +
+    '<label class="f"><span>Bis</span><input type="time" id="p-bis" value="09:30"></label></div>' +
+    '<label class="f"><span>Raum</span><input type="text" id="p-raum" placeholder="optional"></label>' +
+    '<button class="btn" data-act="slotneu">' + svg("plus") + "Eintragen</button></div>",
+    '<button class="btn wide" data-act="settings">Zurück</button>', { zurueck: "settings" });
+}
+async function backup() {
+  if (!DL) return;
+  try {
+    await DL.save({ filename: "karo-klasse" + profil.klasse + "-" + heute() + ".json", data: JSON.stringify({ profil: profil, daten: state }, null, 2) });
+    toast("Sicherung gespeichert.");
+  } catch (e) { if (!(e && e.code === "declined")) toast("Sicherung ging nicht."); }
+}
+
+/* ===================== Noten und Ziele ===================== */
+const NOTEN = [1, 1.3, 1.7, 2, 2.3, 2.7, 3, 3.3, 3.7, 4, 4.3, 4.7, 5, 6];
+const PUNKTE = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+const ZIELE_N = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+const ZIELE_P = [15, 13, 11, 9, 7, 5, 4];
+const punkteSystem = () => (state.cfg.notensystem || (Number(profil.klasse) >= 11 ? "punkte" : "noten")) === "punkte";
+function notenText(n) {
+  if (n == null) return "—";
+  return punkteSystem() ? Math.round(n) + " P" : (Math.round(n * 10) / 10).toFixed(1).replace(".", ",");
+}
+function notenGut(n) {
+  if (n == null) return "grau";
+  const p = punkteSystem();
+  if (p) return n >= 11 ? "gruen" : n >= 7 ? "ocker" : "rot";
+  return n <= 2.4 ? "gruen" : n <= 3.4 ? "ocker" : "rot";
+}
+const zielVon = f => (state.cfg.ziele || {})[f];
+function schnittFach(f) {
+  const l = state.tests.filter(t => t.fach === f && typeof t.note === "number");
+  if (!l.length) return null;
+  let s = 0, w = 0;
+  for (const t of l) { const g = t.gewicht || 1; s += t.note * g; w += g; }
+  return s / w;
+}
+function gesamtSchnitt() {
+  const l = state.tests.filter(t => typeof t.note === "number");
+  if (!l.length) return null;
+  let s = 0, w = 0;
+  for (const t of l) { const g = t.gewicht || 1; s += t.note * g; w += g; }
+  return s / w;
+}
+function benoetigteNote(t) {
+  const z = zielVon(t.fach);
+  if (z == null) return null;
+  const l = state.tests.filter(x => x.fach === t.fach && typeof x.note === "number" && x.id !== t.id);
+  let s = 0, w = 0;
+  for (const x of l) { const g = x.gewicht || 1; s += x.note * g; w += g; }
+  const gw = t.gewicht || 1;
+  const roh = (z * (w + gw) - s) / gw;
+  const lo = punkteSystem() ? 0 : 1, hi = punkteSystem() ? 15 : 6;
+  return { wert: Math.max(lo, Math.min(hi, roh)), machbar: roh >= lo && roh <= hi, roh: roh };
+}
+function aufwand(t) {
+  const d = Math.max(0, tageBis(t.datum));
+  const stand = testStand(t);
+  const standL = stand == null ? .8 : (100 - stand) / 100;
+  const sch = schnittFach(t.fach), z = zielVon(t.fach);
+  let luecke = 0;
+  if (sch != null && z != null) luecke = punkteSystem() ? Math.max(0, (z - sch) / 3) : Math.max(0, sch - z);
+  const dring = d <= 2 ? 1.35 : d <= 5 ? 1.15 : 1;
+  let min = Math.round((12 + 30 * standL + 20 * luecke) * dring / 5) * 5;
+  min = Math.max(10, Math.min(90, min));
+  return { min: min, tage: d, gesamt: min * Math.max(1, d), stufe: min >= 50 ? "hoch" : min >= 28 ? "mittel" : "locker", stand: stand, luecke: luecke, noetig: benoetigteNote(t) };
+}
+function aufwandSaetze(t) {
+  const a = aufwand(t), z = zielVon(t.fach), sch = schnittFach(t.fach), out = [];
+  if (a.noetig) {
+    if (!a.noetig.machbar && (punkteSystem() ? a.noetig.roh > 15 : a.noetig.roh < 1))
+      out.push("Mit diesem Test allein erreichst du dein Ziel " + notenText(z) + " rechnerisch nicht mehr. Hol so viel wie geht, der Rest kommt über die nächsten Noten.");
+    else out.push("Für dein Ziel " + notenText(z) + " in " + t.fach + " brauchst du hier etwa " + notenText(a.noetig.wert) + ".");
+  } else out.push("Kein Ziel für " + t.fach + " gesetzt. Trag eins ein, dann wird dir der nötige Aufwand ausgerechnet.");
+  if (sch != null) out.push("Dein Schnitt liegt gerade bei " + notenText(sch) + ".");
+  if (a.stand == null) out.push("Du hast noch nichts geübt, deshalb ist das vorsichtig gerechnet.");
+  else out.push("Dein Stand im Stoff: " + a.stand + " von 100.");
+  out.push(a.tage <= 0 ? "Der Test ist heute. Nur noch überfliegen." :
+    a.min + " Minuten am Tag bis " + datumKurz(t.datum) + ", zusammen etwa " + (Math.round(a.gesamt / 60 * 10) / 10).toFixed(1).replace(".", ",") + " Stunden.");
+  return out;
+}
+function aufwandBox(t, mitKnopf) {
+  const a = aufwand(t);
+  const farbe = a.stufe === "hoch" ? "rot" : a.stufe === "mittel" ? "ocker" : "gruen";
+  return '<div class="aufwandbox"><div class="kopf">' +
+    '<span class="min">' + (a.tage <= 0 ? "heute" : a.min + " Min") + "</span>" +
+    '<span class="dim sm">' + (a.tage <= 0 ? "letzter Blick" : "pro Tag") + "</span>" +
+    '<span class="pill ' + farbe + '" style="margin-left:auto">Aufwand ' + a.stufe + "</span></div>" +
+    '<p class="sm muted">' + esc(aufwandSaetze(t).join(" ")) + "</p>" +
+    (mitKnopf ? '<div class="btnrow">' +
+      (zielVon(t.fach) == null ? '<button class="btn soft small" data-act="zielsetzen" data-id="' + esc(t.fach) + '">Ziel für ' + esc(t.fach) + " setzen</button>" : "") +
+      '<button class="btn ghost small" data-act="gewicht" data-id="' + t.id + '">Zählt ' + ((t.gewicht || 1) === 1 ? "einfach" : "doppelt") + "</button></div>" : "") +
+    "</div>";
+}
+function offeneNoten() {
+  return state.tests.filter(t => tageBis(t.datum) < 0 && typeof t.note !== "number" && !t.keineNote)
+    .sort((a, b) => b.datum.localeCompare(a.datum));
+}
+function sheetNote(t) {
+  const werte = punkteSystem() ? PUNKTE : NOTEN;
+  sheet("Note eintragen",
+    '<div class="card" style="padding:15px"><div class="row"><span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + "</span>" +
+    '<span class="dim sm mono" style="margin-left:auto">' + datumKurz(t.datum) + "</span></div>" +
+    '<b style="display:block; margin-top:8px; font-family:var(--disp)">' + esc(t.titel) + "</b></div>" +
+    '<div><span class="lbl">Was hast du bekommen</span><div class="notengrid" style="margin-top:8px">' +
+    werte.map(v => '<button data-act="notewahl" data-id="' + t.id + ":" + v + '" aria-pressed="' + (t.note === v) + '">' + notenText(v) + "</button>").join("") + "</div></div>" +
+    '<div><span class="lbl">Wie stark zählt die Arbeit</span><div class="seg" style="margin-top:8px">' +
+    [[1, "Einfach"], [2, "Doppelt"]].map(x => '<button data-act="gewichtwahl" data-id="' + t.id + ":" + x[0] + '" aria-pressed="' + ((t.gewicht || 1) === x[0]) + '">' + x[1] + "</button>").join("") + "</div></div>" +
+    '<button class="btn ghost wide" data-act="keinenote" data-id="' + t.id + '">Gab keine Note, nicht mehr fragen</button>',
+    '<button class="btn wide" data-act="zurtest">Fertig</button>');
+  window.__test = t;
+}
+function sheetZiele() {
+  const faecher = state.faecher.map(f => f.name);
+  const werte = punkteSystem() ? ZIELE_P : ZIELE_N;
+  sheet("Noten und Ziele",
+    '<div><span class="lbl">Notensystem</span><div class="seg" style="margin-top:7px">' +
+    [["noten", "Noten 1 bis 6"], ["punkte", "Punkte 0 bis 15"]].map(x =>
+      '<button data-act="notensystem" data-id="' + x[0] + '" aria-pressed="' + ((punkteSystem() ? "punkte" : "noten") === x[0]) + '">' + x[1] + "</button>").join("") + "</div></div>" +
+    (faecher.length ? faecher.map(f => {
+      const sch = schnittFach(f), z = zielVon(f);
+      return '<div class="card" style="padding:13px 14px; display:flex; flex-direction:column; gap:9px">' +
+        '<div class="row"><span class="chip" style="--h:' + hueVon(f) + '">' + esc(f) + "</span>" +
+        '<span class="notegross" style="margin-left:auto; color:var(--' + (notenGut(sch) === "grau" ? "ink-3" : notenGut(sch)) + ')">' + notenText(sch) + "</span></div>" +
+        '<div class="row"><span class="lbl">Ziel</span><div class="notengrid" style="flex:1">' +
+        werte.map(v => '<button data-act="zielwahl" data-id="' + esc(f) + "|" + v + '" aria-pressed="' + (z === v) + '" style="min-width:50px; min-height:40px; font-size:.9rem">' + notenText(v) + "</button>").join("") +
+        (z != null ? '<button data-act="zielweg" data-id="' + esc(f) + '" style="min-width:44px; min-height:40px" aria-label="Ziel entfernen">✕</button>' : "") +
+        "</div></div></div>";
+    }).join("") : '<div class="empty">Erst Fächer anlegen.</div>'),
+    '<button class="btn wide" data-act="sheetzu">Fertig</button>');
+}
+
+/* ===================== Nachfragen ===================== */
+async function fragen(frage, einfacher) {
+  if (!SAMPLE || !frage.trim()) return;
+  let text = "";
+  const zeig = () => sheet("Deine Frage",
+    '<div class="card flat" style="padding:13px"><b style="font-weight:600; font-size:.95rem">' + esc(frage) + "</b></div>" +
+    '<div class="aitext" id="erkl">' + (text ? esc(text) : '<span class="row"><span class="spin"></span><span class="dim">Antwort kommt gleich...</span></span>') + "</div>",
+    '<button class="btn ghost" data-act="sheetzu">Schließen</button>' +
+    (text && !einfacher ? '<button class="btn" data-act="fragwieder">' + svg("leicht") + "Einfacher</button>" : ""));
+  window.__frage = frage;
+  zeig();
+  const p = "Ein Schüler stellt dir eine Frage zum Schulstoff. " + lernkontext() + "\n" +
+    "Frage: " + frage + "\n\n" + erklaerAnweisung(null, einfacher) + "\n" +
+    "Antworte in höchstens 200 Wörtern. Wenn es eine Rechnung ist, rechne Schritt für Schritt vor. Kein Markdown mit Sternchen, nur Text und Bindestriche. " +
+    "Wenn die Frage nichts mit Schule zu tun hat, sag das freundlich in einem Satz.";
+  try {
+    const r = await SAMPLE(p, { modelTier: "default", onText: ({ text: t2 }) => { text = t2; const el = document.getElementById("erkl"); if (el) el.textContent = t2; } });
+    text = r.text; zeig(); markiereLerntag();
+  } catch (e) { sampleFehler(e, () => fragen(frage, einfacher)); }
+}
+
+/* ===================== Spickzettel ===================== */
+async function spickzettel(t) {
+  if (!SAMPLE) return;
+  let text = "";
+  window.__test = t;
+  const zeig = () => sheet("Spickzettel",
+    '<div class="row"><span class="chip" style="--h:' + hueVon(t.fach) + '">' + esc(t.fach) + '</span><span class="pill grau">' + esc(t.titel) + "</span></div>" +
+    '<div class="aitext" id="erkl">' + (text ? esc(text) : '<span class="row"><span class="spin"></span><span class="dim">Wird zusammengefasst...</span></span>') + "</div>" +
+    (text ? '<p class="kbdhint">Zum Lernen gedacht, nicht zum Mitnehmen in die Arbeit.</p>' : ""),
+    '<button class="btn ghost" data-act="zurtest">Zurück</button>' +
+    (text && DL ? '<button class="btn" data-act="spickspeichern">' + svg("download") + "Sichern</button>" : ""), { zurueck: "zurtest" });
+  zeig();
+  const themen = (t.themen || []).map(x => "- " + x.titel + (x.stichpunkte && x.stichpunkte.length ? ": " + x.stichpunkte.join("; ") : "")).join("\n");
+  const p = "Schreibe eine Kurzfassung für die letzte Wiederholung vor einer Klassenarbeit. " + lernkontext() + "\n" +
+    "Fach: " + t.fach + "\nArbeit: " + t.titel + "\nThemen:\n" + themen + "\n\n" +
+    "Pro Thema eine Überschrift und darunter zwei bis vier Zeilen mit dem, was man wirklich können muss: Regeln, Formeln, Merksätze, Beispiele in Kurzform. " +
+    "Alles auf eine Seite, höchstens 300 Wörter. Kein Markdown mit Sternchen, nur Text und Bindestriche.";
+  try {
+    const r = await SAMPLE(p, { modelTier: "complex", onText: ({ text: t2 }) => { text = t2; const el = document.getElementById("erkl"); if (el) el.textContent = t2; } });
+    text = r.text; window.__spick = { t: t, text: text }; zeig();
+  } catch (e) { sampleFehler(e, () => spickzettel(t)); }
+}
+
+/* ===================== Aktionen ===================== */
+const A = {
+  tab: id => { ui.tab = id; sheetZu(); render(); },
+  filter: id => { ui.filter = id; render(); },
+  sheetzu: () => sheetZu(),
+  settings: () => sheetSettings(),
+  nudges: () => sheetNudges(),
+  nudge: id => {
+    sheetZu();
+    if (id.indexOf("go:") === 0) { ui.tab = id.slice(3); render(); }
+    else if (id.indexOf("test:") === 0) { const t = state.tests.find(x => x.id === id.slice(5)); if (t) sheetTest(t); }
+    else if (id.indexOf("note:") === 0) { const t = state.tests.find(x => x.id === id.slice(5)); if (t) sheetNote(t); }
+  },
+
+  fabscan: () => {
+    if (!SAMPLE) { sheetTest(null); return; }
+    if (!(SAMPLE_LIMITS && SAMPLE_LIMITS.images)) { ui.tab = "scan"; ui.scan = { phase: "text" }; render(); return; }
+    ui.tab = "scan"; ui.scan = { phase: "leer" }; render();
+    bilderWaehlen(true, true);
+  },
+  fabha: () => sheetHA(null),
+
+  note: id => { const t = state.tests.find(x => x.id === id); if (t) sheetNote(t); },
+  notewahl: async id => {
+    const p = id.split(":"), t = state.tests.find(x => x.id === p[0]); if (!t) return;
+    t.note = Number(p[1]); t.keineNote = false; t.gewicht = t.gewicht || 1;
+    await put("tests", t);
+    sheetNote(t);
+    toast("Note gespeichert.");
+  },
+  gewichtwahl: async id => {
+    const p = id.split(":"), t = state.tests.find(x => x.id === p[0]); if (!t) return;
+    t.gewicht = Number(p[1]); await put("tests", t); sheetNote(t);
+  },
+  gewicht: async id => {
+    const t = state.tests.find(x => x.id === id); if (!t) return;
+    t.gewicht = (t.gewicht || 1) === 1 ? 2 : 1; await put("tests", t); sheetTest(t);
+  },
+  keinenote: async id => {
+    const t = state.tests.find(x => x.id === id); if (!t) return;
+    t.keineNote = true; delete t.note; await put("tests", t); sheetZu(); toast("Alles klar, es wird nicht mehr gefragt.");
+  },
+  ziele: () => sheetZiele(),
+  zielsetzen: f => sheetZiele(),
+  zielwahl: id => {
+    const p = id.split("|"), f = p[0], v = Number(p[1]);
+    state.cfg.ziele = state.cfg.ziele || {};
+    state.cfg.ziele[f] = v; putApp("cfg"); sheetZiele();
+  },
+  zielweg: f => { if (state.cfg.ziele) delete state.cfg.ziele[f]; putApp("cfg"); sheetZiele(); },
+  notensystem: id => { state.cfg.notensystem = id; putApp("cfg"); sheetZiele(); },
+
+  fragab: () => { const el = $("#frage"); if (!el || !el.value.trim()) { toast("Schreib deine Frage hin."); return; } const q = el.value.trim(); el.value = ""; fragen(q, false); },
+  fragwieder: () => { merkeEinfacher(); fragen(window.__frage || "", true); },
+  spick: id => { const t = state.tests.find(x => x.id === id); if (t) spickzettel(t); },
+  spickspeichern: async () => {
+    const sp = window.__spick;
+    if (!sp || !DL) return;
+    try {
+      await DL.save({ filename: "spickzettel-" + sp.t.fach.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".md", data: "# " + sp.t.fach + " – " + sp.t.titel + "\n\n" + sp.text });
+      toast("Gesichert.");
+    } catch (e) { if (!(e && e.code === "declined")) toast("Sichern ging nicht."); }
+  },
+  fachfilter: f => { ui.fach = (ui.fach === f ? "" : f); render(); },
+  retry: () => { const r = window.__retry; sheetZu(); if (r) r(); },
+  hilfezurueck: () => { const f = window.__hilfeZurueck; if (f) f(); else sheetZu(); },
+
+  wmodus: () => { ui.web.modus = ui.web.modus === "konto" ? "anmelden" : "konto"; ui.web.fehler = ""; gateRender(); },
+  wanmelden: async () => {
+    const w = ui.web;
+    w.name = ($("#w-name").value || "").trim();
+    const pw = $("#w-pw").value || "";
+    if (!w.name || !pw) { w.fehler = "Name und Passwort ausfüllen."; return gateRender(); }
+    w.laeuft = true; w.fehler = ""; gateRender();
+    try {
+      const r = await api("/api/anmelden", "POST", { name: w.name, passwort: pw });
+      ui.web = null; ui.webFehler = "";
+      await webDatenLaden(r.konto);
+    } catch (e) {
+      w.laeuft = false; w.fehler = (e && e.message) || "Anmelden ging nicht."; gateRender();
+    }
+  },
+  wkonto: async () => {
+    const w = ui.web;
+    w.name = ($("#w-name").value || "").trim();
+    const pw = $("#w-pw").value || "", pw2 = $("#w-pw2").value || "";
+    if (pw !== pw2) { w.fehler = "Die beiden Passwörter sind nicht gleich."; return gateRender(); }
+    if (pw.length < 8) { w.fehler = "Das Passwort braucht mindestens 8 Zeichen."; return gateRender(); }
+    w.laeuft = true; w.fehler = ""; gateRender();
+    try {
+      const r = await api("/api/konto", "POST", { name: w.name, passwort: pw });
+      ui.web = null; ui.webFehler = "";
+      await webDatenLaden(r.konto);
+    } catch (e) {
+      w.laeuft = false; w.fehler = (e && e.message) || "Anlegen ging nicht."; gateRender();
+    }
+  },
+  wpasswort: () => sheet("Passwort ändern",
+    '<label class="f"><span>Bisheriges Passwort</span><input type="password" id="pw-alt" autocomplete="current-password"></label>' +
+    '<label class="f"><span>Neues Passwort</span><input type="password" id="pw-neu" autocomplete="new-password"></label>' +
+    '<label class="f"><span>Neues Passwort wiederholen</span><input type="password" id="pw-neu2" autocomplete="new-password"></label>' +
+    '<p class="sm dim">Mindestens 8 Zeichen. Es gibt keine Zurücksetzung per Mail, schreib es dir auf.</p>',
+    '<button class="btn ghost" data-act="settings">Abbrechen</button><button class="btn" data-act="wpwspeichern">Ändern</button>', { zurueck: "settings" }),
+  wpwspeichern: async () => {
+    const alt = $("#pw-alt").value || "", neu = $("#pw-neu").value || "", neu2 = $("#pw-neu2").value || "";
+    if (neu !== neu2) { toast("Die neuen Passwörter sind nicht gleich."); return; }
+    if (neu.length < 8) { toast("Mindestens 8 Zeichen."); return; }
+    try { await api("/api/passwort", "POST", { alt: alt, neu: neu }); toast("Passwort geändert."); sheetSettings(); }
+    catch (e) { toast((e && e.message) || "Ging nicht."); }
+  },
+  walleweg: async () => {
+    try {
+      await api("/api/alles", "DELETE");
+      state.ha = []; state.tests = []; state.faecher = []; state.plan = [];
+      state.cfg = { seeded: false, streak: [], letzterCheck: "", erklaerstufe: "auto", theme: state.cfg.theme, einfachZaehler: 0 };
+      saveLocal(); sheetZu(); render(); toast("Alles gelöscht.");
+    } catch (e) { srvFehler(e); }
+  },
+
+  setupstart: () => { ui.setup = { schritt: 1, h: 214, klasse: "8", schulform: "Gymnasium", land: "", faecher: ["Mathematik", "Deutsch", "Englisch"], beispiel: true }; gateRender(); },
+  suab: () => { ui.setup = null; gateRender(); },
+  sufarbe: h => { suLesen(); ui.setup.h = Number(h); gateRender(); },
+  suklasse: k => { suLesen(); ui.setup.klasse = k; gateRender(); },
+  sufach: f => {
+    const l = ui.setup.faecher, i = l.indexOf(f);
+    if (i >= 0) l.splice(i, 1); else l.push(f);
+    gateRender();
+  },
+  subeispiel: () => { ui.setup.beispiel = !ui.setup.beispiel; gateRender(); },
+  suweiter: n => { suLesen(); ui.setup.schritt = Number(n); gateRender(); },
+  sufertig: async () => {
+    const s = ui.setup;
+    if (s.web) {
+      profil.klasse = s.klasse; profil.schulform = s.schulform; profil.land = s.land; profil.h = s.h;
+      ui.setup = null;
+      state.faecher = s.faecher.map(n => ({ name: n, h: FACH_HUE[n] != null ? FACH_HUE[n] : 214 }));
+      if (s.beispiel) seed();
+      state.cfg.seeded = true;
+      saveLocal();
+      await putProfile();
+      await putApp("faecher"); await putApp("plan"); await putApp("cfg");
+      for (const h of state.ha) { try { await api("/api/hausaufgabe/" + h.id, "PUT", h); } catch (e) { } }
+      for (const t of state.tests) { try { await api("/api/test/" + t.id, "PUT", t); } catch (e) { } }
+      zeigeOberflaeche();
+      return;
+    }
+    const p = { id: uid(), name: "", klasse: s.klasse, schulform: s.schulform, land: s.land, h: s.h, pin: "", erstellt: Date.now() };
+    profile.push(p);
+    await putProfile();
+    ui.setup = null;
+    profil = p;
+    try { localStorage.setItem(LS_AKTIV, p.id); } catch (e) { }
+    ladeDaten(p.id);
+    state.faecher = s.faecher.map(n => ({ name: n, h: FACH_HUE[n] != null ? FACH_HUE[n] : 214 }));
+    const uebernommen = profile.length === 1 ? await altbestandUebernehmen() : 0;
+    if (s.beispiel && !uebernommen) seed();
+    state.cfg.seeded = true;
+    saveLocal();
+    if (DB) { abonniere(); await alleHochladen(); }
+    zeigeOberflaeche();
+    if (uebernommen) toast(uebernommen + " Einträge aus der alten Version übernommen.");
+  },
+  waehle: id => {
+    const p = profile.find(x => x.id === id);
+    if (!p) return;
+    if (p.pin) { ui.pin = { prof: p, eingabe: "", neu: false, fehler: false }; gateRender(); }
+    else anmelden(p);
+  },
+  pintaste: t => {
+    const p = ui.pin;
+    if (t === "del") p.eingabe = p.eingabe.slice(0, -1);
+    else if (p.eingabe.length < 4) p.eingabe += t;
+    p.fehler = false;
+    if (p.eingabe.length === 4) {
+      if (p.neu) {
+        profil.pin = p.eingabe;
+        const i = profile.findIndex(x => x.id === profil.id);
+        if (i >= 0) profile[i] = profil;
+        putProfile(); ui.pin = null;
+        $("#gate").hidden = true; $("#shell").hidden = false;
+        toast("PIN gesetzt."); sheetSettings(); return;
+      }
+      if (p.eingabe === p.prof.pin) { ui.pin = null; return anmelden(p.prof); }
+      p.eingabe = ""; p.fehler = true;
+    }
+    gateRender();
+  },
+  pinab: () => {
+    if (ui.pin && ui.pin.neu) { ui.pin = null; $("#gate").hidden = true; $("#shell").hidden = false; sheetSettings(); }
+    else { ui.pin = null; gateRender(); }
+  },
+  spin: () => {
+    if (profil.pin) {
+      profil.pin = "";
+      const i = profile.findIndex(x => x.id === profil.id); if (i >= 0) profile[i] = profil;
+      putProfile(); toast("PIN entfernt."); sheetSettings(); return;
+    }
+    sheetZu(); ui.pin = { prof: profil, eingabe: "", neu: true, fehler: false };
+    $("#shell").hidden = true; $("#gate").hidden = false; gateRender();
+  },
+  abmelden: () => (SRV ? webAbmelden() : abmelden()),
+  sprofil: () => sheetProfilEdit(),
+  peklasse: k => { profil.klasse = k; sheetProfilEdit(); },
+  pefarbe: h => { profil.h = Number(h); sheetProfilEdit(); },
+  pespeichern: async () => {
+    profil.name = ($("#pe-name").value || "").trim();
+    profil.schulform = $("#pe-schulform").value;
+    profil.land = $("#pe-land").value;
+    const i = profile.findIndex(x => x.id === profil.id);
+    if (i >= 0) profile[i] = profil;
+    await putProfile(); render(); sheetSettings(); toast("Gespeichert.");
+  },
+  profloeschen: async () => {
+    const id = profil.id;
+    profile = profile.filter(x => x.id !== id);
+    await putProfile();
+    try { localStorage.removeItem(lsDaten(id)); } catch (e) { }
+    if (DB) {
+      try {
+        for (const h of state.ha) await DB.doc("p/" + id + "/hausaufgaben/" + h.id).delete();
+        for (const t of state.tests) await DB.doc("p/" + id + "/tests/" + t.id).delete();
+        for (const f of ["faecher", "plan", "cfg"]) await DB.doc("p/" + id + "/app/" + f).delete();
+      } catch (e) { }
+    }
+    abmelden(); toast("Profil gelöscht.");
+  },
+  sstufe: id => { state.cfg.erklaerstufe = id; state.cfg.einfachZaehler = 0; putApp("cfg"); sheetSettings(); },
+  stheme: id => { state.cfg.theme = id; putApp("cfg"); sheetSettings(); },
+
+  toggleha: async id => {
+    const h = state.ha.find(x => x.id === id); if (!h) return;
+    h.erledigt = !h.erledigt; h.erledigtAm = h.erledigt ? heute() : "";
+    if (h.erledigt) markiereLerntag();
+    await put("hausaufgaben", h);
+  },
+  editha: id => sheetHA(state.ha.find(x => x.id === id)),
+  neueha: id => { sheetHA(null); if (id) { const el = $("#h-faellig"); if (el) el.value = id; } },
+  hdatum: n => { const el = $("#h-faellig"); if (el) el.value = plusTage(heute(), Number(n)); },
+  hspeichern: async id => {
+    const titel = ($("#h-titel").value || "").trim();
+    if (!titel) { toast("Schreib kurz hin, was zu tun ist."); return; }
+    const h = Object.assign({}, window.__ha || {}, { id: id, titel: titel, fach: $("#h-fach").value, faellig: $("#h-faellig").value || plusTage(heute(), 1), notiz: ($("#h-notiz").value || "").trim() });
+    delete h.beispiel;
+    sheetZu(); fachSichern(h.fach); await put("hausaufgaben", h);
+  },
+  haloeschen: async id => { sheetZu(); await del("hausaufgaben", id); toast("Gelöscht."); },
+
+  neuertest: id => { sheetTest(null); if (id) { const el = $("#t-datum"); if (el) el.value = id; } },
+  test: id => { const t = state.tests.find(x => x.id === id); if (t) sheetTest(t); },
+  zurtest: () => { const t = window.__test; if (t) sheetTest(state.tests.find(x => x.id === t.id) || t); else sheetZu(); },
+  testbearbeiten: id => sheetTestEdit(state.tests.find(x => x.id === id)),
+  tspeichern: async id => {
+    const titel = ($("#t-titel").value || "").trim();
+    if (!titel) { toast("Gib der Arbeit einen Titel."); return; }
+    const themen = ($("#t-themen").value || "").split("\n").map(s => s.trim()).filter(Boolean).map(s => ({ titel: s, stichpunkte: [] }));
+    const t = { id: id, fach: $("#t-fach").value, titel: titel, datum: $("#t-datum").value || plusTage(heute(), 7), themen: themen, karten: [], versuche: [], erstellt: Date.now() };
+    fachSichern(t.fach);
+    sheetZu(); await put("tests", t);
+    ui.tab = "lernen"; render(); sheetTest(t);
+  },
+  tupdate: async id => {
+    const t = state.tests.find(x => x.id === id); if (!t) return;
+    const alt = {}; for (const th of (t.themen || [])) alt[th.titel] = th.stichpunkte || [];
+    t.fach = $("#t-fach").value; t.titel = ($("#t-titel").value || "").trim() || t.titel; t.datum = $("#t-datum").value || t.datum;
+    t.themen = ($("#t-themen").value || "").split("\n").map(s => s.trim()).filter(Boolean).map(s => ({ titel: s, stichpunkte: alt[s] || [] }));
+    delete t.beispiel;
+    fachSichern(t.fach);
+    await put("tests", t); sheetTest(t);
+  },
+  testloeschen: async id => { sheetZu(); await del("tests", id); toast("Test gelöscht."); },
+  kartenbauen: id => { const t = state.tests.find(x => x.id === id); if (t) kartenBauen(t); },
+  erklaer: id => { const p = id.split(":"); const t = state.tests.find(x => x.id === p[0]); if (t) erklaerThema(t, Number(p[1]), false); },
+  nocheinfacher: id => { const p = id.split(":"); const t = state.tests.find(x => x.id === p[0]); if (t) { merkeEinfacher(); erklaerThema(t, Number(p[1]), true); } },
+  lernplan: id => { const t = state.tests.find(x => x.id === id); if (t) lernplan(t); },
+
+  flash: id => {
+    const t = state.tests.find(x => x.id === id); if (!t) return;
+    const h = heute();
+    let k = (t.karten || []).filter(x => !x.due || x.due <= h);
+    if (!k.length) k = (t.karten || []).slice();
+    flashStart(k, t.fach);
+  },
+  flashthema: id => {
+    const p = id.split(":"); const t = state.tests.find(x => x.id === p[0]); if (!t) return;
+    const th = (t.themen || [])[Number(p[1])]; if (!th) return;
+    const k = (t.karten || []).filter(x => x.thema === th.titel);
+    if (!k.length) { toast("Zu diesem Thema gibt es noch keine Karten."); return; }
+    flashStart(k, th.titel);
+  },
+  lernenalle: () => {
+    const h = heute(), alle = [];
+    for (const t of state.tests) if (tageBis(t.datum) >= -1) for (const k of (t.karten || [])) if (!k.due || k.due <= h) alle.push(k);
+    flashStart(alle, "Alle Fächer");
+  },
+  flashdreh: () => { if (flash) { flash.auf = !flash.auf; flashRender(); } },
+  flashgut: () => flashBewerten(true),
+  flashnochmal: () => flashBewerten(false),
+  flashwieder: () => flashStart(flash.karten, flash.titel),
+  kartehilfe: () => { const k = flash.karten[flash.i]; kurzHilfe(k.thema || flash.titel, k.f, k.a, () => flashRender()); },
+
+  quizstart: id => { const t = state.tests.find(x => x.id === id); if (t) quizStart(t); },
+  quizwahl: i => {
+    if (!quiz || quiz.wahl != null) return;
+    quiz.wahl = Number(i);
+    const f = quiz.fragen[quiz.i], th = f.thema || "";
+    const pt = (quiz.proThema[th] = quiz.proThema[th] || { r: 0, g: 0 });
+    pt.g++;
+    if (quiz.wahl === f.richtig) { quiz.punkte++; pt.r++; } else quiz.falsch.push(th);
+    quizRender();
+  },
+  quizweiter: () => { quiz.i++; quiz.wahl = null; quizRender(); },
+  quizhilfe: () => { const f = quiz.fragen[quiz.i]; kurzHilfe(f.thema || quiz.t.fach, f.frage, f.optionen[f.richtig], () => quizRender()); },
+
+  quickadd: () => quickAdd($("#quick").value || ""),
+  foto: () => bilderWaehlen(true),
+  galerie: () => bilderWaehlen(false),
+  textscan: () => { ui.scan = { phase: "text", text: "" }; render(); },
+  scanweg: i => {
+    const sc = ui.scan; if (!sc || !sc.blobs) return;
+    URL.revokeObjectURL(sc.urls[Number(i)]);
+    sc.blobs.splice(Number(i), 1); sc.urls.splice(Number(i), 1);
+    if (!sc.blobs.length) ui.scan = { phase: "leer" };
+    render();
+  },
+  scanreset: () => { if (ui.scan && ui.scan.urls) ui.scan.urls.forEach(u => URL.revokeObjectURL(u)); ui.scan = { phase: "leer" }; render(); },
+  scanlesen: () => scanLesen(ui.scan.blobs, null),
+  textlesen: () => { const v = ($("#scantext").value || "").trim(); if (!v) { toast("Schreib etwas hinein."); return; } scanLesen(null, v); },
+  themaweg: i => { ui.scan.erg.themen.splice(Number(i), 1); render(); },
+  scanhaweg: i => { ui.scan.erg.aufgaben.splice(Number(i), 1); if (!ui.scan.erg.aufgaben.length) ui.scan = { phase: "leer" }; render(); },
+  scanhaspeichern: async () => {
+    const auf = ui.scan.erg.aufgaben;
+    ui.scan = { phase: "leer" };
+    for (const a of auf) { fachSichern(a.fach); await put("hausaufgaben", { id: uid(), fach: a.fach, titel: a.titel, notiz: a.notiz, faellig: a.faellig, erledigt: false, erstellt: Date.now() }); }
+    ui.tab = "aufgaben"; render(); toast(auf.length + " Aufgaben eingetragen.");
+  },
+  scanspeichern: async () => {
+    const e = ui.scan.erg;
+    const datum = $("#e-datum").value;
+    if (!datum) { toast("Wann ist die Arbeit? Trag das Datum ein."); const el = $("#e-datum"); if (el) el.focus(); return; }
+    const fach = ($("#e-fach").value || e.fach).trim();
+    const t = { id: uid(), fach: fach, titel: ($("#e-titel").value || e.titel).trim(), datum: datum, themen: e.themen, karten: [], versuche: [], gewicht: 1, erstellt: Date.now() };
+    fachSichern(fach);
+    ui.scan = { phase: "leer" };
+    await put("tests", t);
+    ui.calSel = datum; ui.calM = datum.slice(0, 7);
+    ui.tab = "lernen"; render();
+    toast("Im Kalender am " + datumKurz(datum) + " eingetragen.");
+    if (SAMPLE) kartenBauen(t); else sheetTest(t);
+  },
+
+  calansicht: id => { ui.calAnsicht = id; render(); },
+  calmon: n => {
+    const b = ui.calM ? fromISO(ui.calM + "-01") : fromISO(heute().slice(0, 7) + "-01");
+    b.setMonth(b.getMonth() + Number(n));
+    ui.calM = b.getFullYear() + "-" + pad(b.getMonth() + 1);
+    render();
+  },
+  calwoche: n => { ui.calSel = plusTage(ui.calSel || heute(), Number(n)); render(); },
+  calheute: () => { ui.calM = heute().slice(0, 7); ui.calSel = heute(); render(); },
+  calday: iso => { ui.calSel = iso; if (iso.slice(0, 7) !== (ui.calM || heute().slice(0, 7))) ui.calM = iso.slice(0, 7); render(); },
+
+  sfaecher: () => sheetFaecher(),
+  splan: () => sheetPlan(),
+  sbenachr: () => sheetBenachr(),
+  benachrfrage: () => benachrAnfragen(),
+  fachneu: () => {
+    const v = ($("#neuesfach").value || "").trim(); if (!v) return;
+    if (state.faecher.some(f => f.name === v)) { toast("Gibt es schon."); return; }
+    state.faecher.push({ name: v, h: FACH_HUE[v] != null ? FACH_HUE[v] : Math.floor(Math.random() * 36) * 10 });
+    putApp("faecher"); sheetFaecher();
+  },
+  fachweg: i => { state.faecher.splice(Number(i), 1); putApp("faecher"); sheetFaecher(); },
+  slotneu: () => {
+    state.plan.push({ id: uid(), tag: Number($("#p-tag").value), von: $("#p-von").value || "08:00", bis: $("#p-bis").value || "09:30", fach: $("#p-fach").value, raum: ($("#p-raum").value || "").trim() });
+    putApp("plan"); sheetPlan();
+  },
+  slotweg: id => { state.plan = state.plan.filter(s => s.id !== id); putApp("plan"); sheetPlan(); },
+  backup: () => backup(),
+  beispielweg: async () => {
+    const bh = state.ha.filter(x => x.beispiel), bt = state.tests.filter(x => x.beispiel);
+    state.ha = state.ha.filter(x => !x.beispiel); state.tests = state.tests.filter(x => !x.beispiel);
+    state.plan = state.plan.filter(x => !x.beispiel);
+    saveLocal(); putApp("plan");
+    if (DB) {
+      for (const x of bh) try { await DB.doc(P() + "/hausaufgaben/" + x.id).delete(); } catch (e) { }
+      for (const x of bt) try { await DB.doc(P() + "/tests/" + x.id).delete(); } catch (e) { }
+    }
+    render(); sheetSettings(); toast("Beispiele weg.");
+  },
+  alterweg: async () => {
+    const grenze = plusTage(heute(), -21);
+    const alt = state.ha.filter(x => x.erledigt && (x.erledigtAm || x.faellig) < grenze);
+    if (!alt.length) { toast("Nichts zum Aufräumen."); return; }
+    state.ha = state.ha.filter(x => alt.indexOf(x) < 0); saveLocal();
+    if (DB) for (const x of alt) try { await DB.doc(P() + "/hausaufgaben/" + x.id).delete(); } catch (e) { }
+    render(); sheetSettings(); toast(alt.length + " alte Einträge entfernt.");
+  }
+};
+
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el || el.tagName === "INPUT") return;
+  const fn = A[el.dataset.act];
+  if (fn) { e.preventDefault(); fn(el.dataset.id, el, e); }
+});
+document.addEventListener("input", e => {
+  const el = e.target.closest('[data-act="fachhue"]');
+  if (!el) return;
+  const f = state.faecher[Number(el.dataset.id)];
+  if (f) { f.h = Number(el.value); const d = el.parentElement.querySelector(".dot"); if (d) d.style.setProperty("--h", f.h); }
+});
+document.addEventListener("change", e => { if (e.target.closest('[data-act="fachhue"]')) { saveLocal(); putApp("faecher"); } });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !$("#sheet").hidden) return sheetZu();
+  if (e.key === "Enter" && e.target.id === "quick") { e.preventDefault(); quickAdd(e.target.value || ""); }
+  if (e.key === "Enter" && e.target.id === "frage") { e.preventDefault(); A.fragab(); }
+  if (e.key === "Enter" && e.target.id === "neuesfach") { e.preventDefault(); A.fachneu(); }
+  if (e.key === "Enter" && (e.target.id === "w-pw" || e.target.id === "w-pw2" || e.target.id === "w-name")) {
+    e.preventDefault();
+    if (e.target.id === "w-name") { const n = $("#w-pw"); if (n) n.focus(); return; }
+    (ui.web && ui.web.modus === "konto" ? A.wkonto : A.wanmelden)();
+  }
+  if (!$("#sheet").hidden && flash) {
+    if (e.key === " ") { e.preventDefault(); A.flashdreh(); }
+    if (flash.auf && (e.key === "1" || e.key === "ArrowLeft")) A.flashnochmal();
+    if (flash.auf && (e.key === "2" || e.key === "ArrowRight")) A.flashgut();
+  }
+});
+$("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") sheetZu(); });
+
+/* ===================== Start ===================== */
+if (WEB) {
+  zeigeOberflaeche();
+  initWeb();
+} else {
+  try { const raw = localStorage.getItem(LS_PROF); if (raw) profile = JSON.parse(raw) || []; } catch (e) { }
+  let aktiv = null;
+  try { aktiv = localStorage.getItem(LS_AKTIV); } catch (e) { }
+  const vor = profile.find(p => p.id === aktiv);
+  if (vor) { profil = vor; ladeDaten(vor.id); }
+  zeigeOberflaeche();
+  initDB();
+  initSample();
+  initDownloads();
+}
+setTimeout(pruefeErinnerung, 4000);
+setInterval(() => { if (document.visibilityState === "visible" && profil) { render(); pruefeErinnerung(); } }, 120000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && profil) render(); });
+</script>
+
+</body>
+</html>
