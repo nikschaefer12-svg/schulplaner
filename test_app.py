@@ -9,6 +9,7 @@ Achtung: Geprueft wird der SQLite-Weg. Der Postgres-Weg (DATABASE_URL gesetzt)
 benutzt teils anderes SQL, siehe USE_PG in app.py, und laesst sich nur gegen
 eine echte Postgres-Datenbank pruefen.
 """
+import base64
 import json
 import os
 import sys
@@ -29,6 +30,14 @@ os.environ["KI_LIMIT_GESAMT"] = "6"
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import app  # noqa: E402
+
+
+# Muss vor der ersten Anfrage registriert werden, spaeter laesst Flask das
+# nicht mehr zu.
+@app.app.get("/api/kaputt-zum-testen")
+def _kaputt():
+    raise RuntimeError("absichtlich")
+
 
 failed = []
 
@@ -230,6 +239,73 @@ check("Gueltiges Bild wird angenommen", len(b) == 1 and b[0]["source"]["media_ty
 
 check("JSON aus Codezaun wird gelesen",
       ki.wert.__doc__ is not None and json.loads('{"a":1}')["a"] == 1)
+
+check("KI meldet, dass das Paket da ist", ki.grenzen()["paket"] is True, ki.grenzen()["paket"])
+
+# Geht das Foto wirklich an Claude? Der Aufruf wird abgefangen und der
+# Inhalt geprueft, ohne dass etwas verschickt wird oder Geld kostet.
+_gesendet = {}
+
+
+class _FakeMessages:
+    def create(self, **kw):
+        _gesendet.update(kw)
+
+        class B:
+            type = "text"
+            text = '{"art":"test","fach":"Mathematik","titel":"X","themen":[]}'
+
+        class R:
+            content = [B()]
+            stop_reason = "end_turn"
+
+        return R()
+
+
+class _FakeClient:
+    messages = _FakeMessages()
+
+
+_jpeg = base64.b64encode(bytes.fromhex(
+    "ffd8ffe000104a46494600010100000100010000ffdb004300" + "08" * 64
+    + "ffc0000b080001000101011100ffc40014000100000000000000000000000000000009"
+    + "ffda0008010100003f00d2cf20ffd9")).decode()
+
+_echt_test, _echt_key, _echt_client = ki.TESTMODUS, ki.ANTHROPIC_API_KEY, ki._client
+ki.TESTMODUS = False
+ki.ANTHROPIC_API_KEY = "sk-ant-nur-fuer-den-test"
+ki._client = _FakeClient()
+try:
+    ki.wert("Lies das Bild.", ["data:image/jpeg;base64," + _jpeg], "medium")
+    _n = _gesendet["messages"][0]
+    _typen = [t["type"] for t in _n["content"]]
+    check("Das Bild geht als Bildblock an Claude", "image" in _typen, _typen)
+    check("Der Text steht dahinter", _typen[-1] == "text", _typen)
+    check("Das Modell stimmt", _gesendet["model"] == ki.KI_MODELL, _gesendet.get("model"))
+    check("Der Aufwand wird mitgegeben", _gesendet.get("output_config") == {"effort": "medium"},
+          _gesendet.get("output_config"))
+    _bild = next(t for t in _n["content"] if t["type"] == "image")
+    check("Das Bild geht als Base64 mit Typ", _bild["source"]["media_type"] == "image/jpeg"
+          and len(_bild["source"]["data"]) > 50, _bild["source"]["media_type"])
+finally:
+    ki.TESTMODUS, ki.ANTHROPIC_API_KEY, ki._client = _echt_test, _echt_key, _echt_client
+
+# Ein Absturz unter /api muss JSON liefern, nicht HTML. Sonst sieht die
+# Oberflaeche nur "Der Server hat abgelehnt" und niemand weiss, warum.
+c9 = neuer_client()
+r = c9.get("/api/kaputt-zum-testen")
+check("Absturz unter /api kommt als JSON", r.status_code == 500 and r.is_json, r.status_code)
+check("Der Fehlertext nennt die Ursache",
+      "RuntimeError" in (r.get_json() or {}).get("fehler", ""), (r.get_json() or {}).get("fehler"))
+
+# 405 statt 404, weil /api/<art> als PUT-Route existiert. Wichtig ist hier
+# nur, dass auch das als JSON zurueckkommt.
+r = c9.get("/api/gibtesnicht")
+check("Unbekannter API-Pfad kommt als JSON", r.status_code in (404, 405) and r.is_json,
+      r.status_code)
+
+r = c9.get("/gibtesnicht")
+check("Ausserhalb von /api bleibt es eine normale Fehlerseite", r.status_code == 404 and not r.is_json)
 
 # ---- Einladungscode ------------------------------------------------------
 app.REG_CODE = "sesam"

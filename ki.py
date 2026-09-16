@@ -37,6 +37,18 @@ ERLAUBTE_TYPEN = ("image/jpeg", "image/png", "image/webp", "image/gif")
 _client = None
 
 
+class _Log:
+    """Winziger Ersatz fuer einen Logger, damit ki.py nichts von app.py braucht."""
+
+    @staticmethod
+    def logger_warnung(text):
+        import logging
+        logging.getLogger("schulplaner.ki").warning("%s", text)
+
+
+app = _Log()
+
+
 def verfuegbar():
     return bool(ANTHROPIC_API_KEY) or TESTMODUS
 
@@ -45,6 +57,7 @@ def grenzen():
     """Was die Oberflaeche ueber diesen Server wissen muss."""
     return {
         "aktiv": verfuegbar(),
+        "paket": TESTMODUS or paket_da(),
         "modell": KI_MODELL if not TESTMODUS else "testmodus",
         "maxZeichen": MAX_PROMPT_ZEICHEN,
         "bilder": {"maxCount": MAX_BILDER, "maxBytes": MAX_BILD_BYTES,
@@ -52,12 +65,38 @@ def grenzen():
     }
 
 
+def paket_da():
+    """Ob die Bibliothek installiert ist. Wird auch von /diag abgefragt."""
+    try:
+        import anthropic  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
 def client():
     global _client
     if _client is None:
-        import anthropic
-        _client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY, timeout=TIMEOUT_S, max_retries=1)
+        _client = _anthropic().Anthropic(api_key=ANTHROPIC_API_KEY, timeout=TIMEOUT_S,
+                                         max_retries=1)
     return _client
+
+
+def _anthropic():
+    """Laedt die Bibliothek und macht aus einem fehlenden Paket eine Meldung.
+
+    Der Import steht absichtlich nicht oben in der Datei: ohne Schluessel wird
+    er nie gebraucht. Der Preis dafuer ist, dass ein fehlendes Paket erst beim
+    ersten Aufruf auffaellt - deshalb hier eine klare Meldung statt eines
+    Absturzes, und deshalb meldet /diag zusaetzlich, ob das Paket da ist.
+    """
+    try:
+        import anthropic
+        return anthropic
+    except ImportError:
+        raise KiFehler(
+            "Auf dem Server fehlt das Paket anthropic. In requirements.txt "
+            "eintragen und neu deployen.", "kein_paket", 503)
 
 
 class KiFehler(Exception):
@@ -112,14 +151,29 @@ def _aufrufen(prompt, bilder, effort, max_tokens):
     if TESTMODUS:
         return _testantwort(prompt)
 
-    import anthropic
+    anthropic = _anthropic()
+    nachricht = {"role": "user", "content": inhalt}
     try:
-        antwort = client().messages.create(
-            model=KI_MODELL,
-            max_tokens=max_tokens,
-            output_config={"effort": effort},
-            messages=[{"role": "user", "content": inhalt}],
-        )
+        try:
+            antwort = client().messages.create(
+                model=KI_MODELL,
+                max_tokens=max_tokens,
+                output_config={"effort": effort},
+                messages=[nachricht],
+            )
+        except anthropic.BadRequestError as exc:
+            # output_config steuert, wie gruendlich Claude nachdenkt, und spart
+            # damit Geld. Lehnt das Konto oder das Modell den Parameter ab,
+            # ist das kein Grund, die ganze Funktion sterben zu lassen -
+            # einmal ohne ihn nachfassen und weitermachen.
+            if "output_config" not in str(exc) and "effort" not in str(exc):
+                raise
+            app.logger_warnung("output_config abgelehnt, es geht ohne weiter: %s" % exc)
+            antwort = client().messages.create(
+                model=KI_MODELL,
+                max_tokens=max_tokens,
+                messages=[nachricht],
+            )
     except anthropic.AuthenticationError:
         raise KiFehler("Der API-Schluessel stimmt nicht.", "schluessel", 502)
     except anthropic.PermissionDeniedError:

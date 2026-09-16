@@ -626,6 +626,26 @@ def manifest():
     return app.send_static_file("manifest.webmanifest")
 
 
+@app.errorhandler(Exception)
+def jeder_fehler(exc):
+    """Unter /api immer JSON zurueckgeben, niemals eine HTML-Fehlerseite.
+
+    Die Oberflaeche liest die Antwort als JSON und zeigt das Feld "fehler" an.
+    Kommt stattdessen HTML, sieht der Nutzer nur "Der Server hat abgelehnt"
+    und niemand weiss, was los war - genau so ist am 16.09.2026 ein fehlendes
+    Paket als Raetsel geendet.
+    """
+    from werkzeug.exceptions import HTTPException
+    status = exc.code if isinstance(exc, HTTPException) else 500
+    if not request.path.startswith("/api/"):
+        return exc if isinstance(exc, HTTPException) else ("Serverfehler", 500)
+    if status >= 500:
+        app.logger.exception("Unbehandelter Fehler bei %s", request.path)
+        return jsonify(fehler="Auf dem Server ist etwas schiefgelaufen: %s. Schau in /diag."
+                       % type(exc).__name__, code="serverfehler"), 500
+    return jsonify(fehler=getattr(exc, "description", "Abgelehnt."), code="http_%d" % status), status
+
+
 @app.get("/health")
 def health():
     return "ok", 200
@@ -665,7 +685,8 @@ def diag():
         # Render legt den ausgelieferten Commit in diese Variable.
         "commit": os.environ.get("RENDER_GIT_COMMIT", "")[:7],
         "seite": seiten_stand(),
-        "ki": {"aktiv": ki.verfuegbar(), "modell": ki.grenzen()["modell"]},
+        "ki": {"aktiv": ki.verfuegbar(), "modell": ki.grenzen()["modell"],
+               "paket": ki.grenzen()["paket"]},
         "reg_code": bool(REG_CODE),
     }
     started = time.time()
