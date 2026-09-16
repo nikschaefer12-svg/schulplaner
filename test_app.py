@@ -9,6 +9,7 @@ Achtung: Geprueft wird der SQLite-Weg. Der Postgres-Weg (DATABASE_URL gesetzt)
 benutzt teils anderes SQL, siehe USE_PG in app.py, und laesst sich nur gegen
 eine echte Postgres-Datenbank pruefen.
 """
+import json
 import os
 import sys
 import tempfile
@@ -19,6 +20,12 @@ if os.path.exists(DB):
 os.environ["SCHULPLANER_DB"] = DB
 os.environ["SCHULPLANER_SECRET"] = "test-geheimnis-nur-fuer-den-durchlauf"
 os.environ.pop("DATABASE_URL", None)
+# Feste Antworten statt echter Claude-Aufrufe: so laesst sich der ganze Weg
+# pruefen, ohne einen Schluessel zu brauchen und ohne Geld auszugeben.
+os.environ["KI_TESTMODUS"] = "1"
+os.environ.pop("ANTHROPIC_API_KEY", None)
+os.environ["KI_LIMIT_KONTO"] = "3"
+os.environ["KI_LIMIT_GESAMT"] = "6"
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import app  # noqa: E402
@@ -172,6 +179,67 @@ d4 = c4.get("/api/daten").get_json()
 check("Alles loeschen leert die Daten", r.status_code == 200 and len(d4["tests"]) == 0, len(d4["tests"]))
 r = c4.get("/api/ich")
 check("Das Konto bleibt bestehen", r.get_json()["angemeldet"] is True)
+
+# ---- KI ------------------------------------------------------------------
+import ki  # noqa: E402
+
+r = c.get("/api/ki")
+j = r.get_json()
+check("KI meldet sich als aktiv (Testmodus)", j["aktiv"] is True and j["modell"] == "testmodus", j)
+check("KI nennt Bildgrenzen", j["bilder"]["maxCount"] >= 1 and j["bilder"]["mediaTypes"], j.get("bilder"))
+
+c6 = neuer_client()
+r = c6.post("/api/ki/text", json={"prompt": "Hallo"})
+check("KI ohne Anmeldung ist gesperrt", r.status_code == 401, r.status_code)
+
+c7 = neuer_client()
+c7.post("/api/konto", json={"name": "kinutzer", "passwort": "geheimgeheim1"})
+r = c7.post("/api/ki/text", json={"prompt": "Erklaere mir Bruchrechnen"})
+check("KI-Text kommt zurueck", r.status_code == 200 and "Testantwort" in r.get_json()["text"], r.status_code)
+
+r = c7.post("/api/ki/json", json={"prompt": 'Schreibe Karteikarten, Antwort als {"karten":[]}'})
+j = r.get_json()
+check("KI-JSON wird geparst", r.status_code == 200 and len(j["wert"]["karten"]) == 14,
+      r.status_code)
+
+r = c7.get("/api/ki")
+check("Nutzung wird gezaehlt", r.get_json()["heute"] == 2, r.get_json().get("heute"))
+
+r = c7.post("/api/ki/text", json={"prompt": "Noch eine"})
+check("Dritter Aufruf geht noch", r.status_code == 200, r.status_code)
+r = c7.post("/api/ki/text", json={"prompt": "Einer zu viel"})
+check("Tageslimit je Konto greift", r.status_code == 429 and r.get_json()["code"] == "limit_konto",
+      r.status_code)
+
+r = c7.post("/api/ki/text", json={"prompt": ""})
+check("Leerer Prompt wird nicht durchgelassen", r.status_code in (400, 429), r.status_code)
+
+# Bilder pruefen, ohne den Server zu bemuehen
+try:
+    ki._bilder_pruefen(["data:image/svg+xml;base64,PHN2Zz48L3N2Zz4="])
+    check("Falscher Bildtyp wird abgelehnt", False, "keine Ausnahme")
+except ki.KiFehler as exc:
+    check("Falscher Bildtyp wird abgelehnt", exc.code == "bild_typ", exc.code)
+try:
+    ki._bilder_pruefen(["data:image/png;base64,keingueltigesbase64!!"])
+    check("Kaputtes Bild wird abgelehnt", False, "keine Ausnahme")
+except ki.KiFehler as exc:
+    check("Kaputtes Bild wird abgelehnt", exc.code == "bild_defekt", exc.code)
+b = ki._bilder_pruefen(["data:image/jpeg;base64,/9j/4AAQSkZJRg=="])
+check("Gueltiges Bild wird angenommen", len(b) == 1 and b[0]["source"]["media_type"] == "image/jpeg")
+
+check("JSON aus Codezaun wird gelesen",
+      ki.wert.__doc__ is not None and json.loads('{"a":1}')["a"] == 1)
+
+# ---- Einladungscode ------------------------------------------------------
+app.REG_CODE = "sesam"
+c8 = neuer_client()
+r = c8.post("/api/konto", json={"name": "ohnecode", "passwort": "geheimgeheim1"})
+check("Ohne Code kein Konto", r.status_code == 403 and r.get_json().get("code_noetig") is True,
+      r.status_code)
+r = c8.post("/api/konto", json={"name": "mitcode", "passwort": "geheimgeheim1", "code": "sesam"})
+check("Mit Code geht es", r.status_code == 201, r.status_code)
+app.REG_CODE = ""
 
 # ---- Zustand -------------------------------------------------------------
 r = c.get("/diag")

@@ -22,7 +22,8 @@ Datenbank gerade klemmt. `/diag` sagt, woran es liegt.
 python test_app.py
 ```
 
-läuft 44 Prüfungen gegen eine Wegwerf-Datenbank. Kein Server nötig.
+läuft 60 Prüfungen gegen eine Wegwerf-Datenbank. Kein Server nötig, und die
+KI läuft dabei im Testmodus, es entstehen also keine Kosten.
 
 ## Aufbau
 
@@ -33,6 +34,7 @@ läuft 44 Prüfungen gegen eine Wegwerf-Datenbank. Kein Server nötig.
 | `bauen.py` | macht daraus `templates/index.html` |
 | `templates/index.html` | das Ergebnis, wird ausgeliefert und mit eingecheckt |
 | `static/` | Symbole und das Manifest für den Home-Bildschirm |
+| `ki.py` | die Claude-Aufrufe, hier liegt der Schlüssel |
 | `test_app.py` | Prüfungen ohne laufenden Server |
 
 Nach jeder Änderung an `oberflaeche.html`:
@@ -68,6 +70,9 @@ ohnehin nichts.
 | PUT/DELETE | `/api/hausaufgabe/<id>` | eine Hausaufgabe |
 | PUT/DELETE | `/api/test/<id>` | ein Test mit Karten und Noten |
 | DELETE | `/api/alles` | alle Daten des Kontos, Konto bleibt |
+| GET | `/api/ki` | ob Claude verfügbar ist, Grenzen, heutiger Verbrauch |
+| POST | `/api/ki/text` | Prompt rein, Text raus |
+| POST | `/api/ki/json` | Prompt rein, geparstes JSON raus |
 | GET | `/health` `/diag` | Zustand |
 
 ## Wie die Daten liegen
@@ -146,11 +151,55 @@ macht dasselbe mit der Datenbank. Beides ist normal und kein Fehler.
 Seite in Safari öffnen, anmelden, Teilen-Knopf, **Zum Home-Bildschirm**.
 Danach startet sie ohne Adressleiste und mit eigenem Symbol.
 
-## Fotos lesen ohne Claude
+## Claude auf dem Server
 
-Die Seite kann Lernzielkataloge abfotografieren und auslesen. Dafür lädt sie
-beim ersten Scan `tesseract.js` nach und erkennt den Text im Browser selbst.
-Das Bild verlässt das Gerät nicht, und es kostet nichts.
+Setzt du `ANTHROPIC_API_KEY`, kann die Seite alles, was die Artifact-Fassung
+auch kann: Lernziele aus Fotos lesen, Karteikarten und Quizfragen erzeugen,
+Erklärungen, Lernpläne und Spickzettel schreiben.
+
+Der Schlüssel liegt dabei **nur** in den Umgebungsvariablen des Servers. Das
+Gerät schickt seine Anfrage an `/api/ki/text` oder `/api/ki/json`, der Server
+ruft Claude und gibt nur die fertige Antwort zurück. Der Schlüssel wird nie
+mit ausgeliefert.
+
+### Umgebungsvariablen
+
+| Name | Vorgabe | Wofür |
+| --- | --- | --- |
+| `ANTHROPIC_API_KEY` | leer | ohne ihn ist die KI aus |
+| `KI_MODELL` | `claude-opus-5` | `claude-sonnet-5` oder `claude-haiku-4-5` sind billiger |
+| `KI_LIMIT_KONTO` | `80` | Anfragen je Konto und Tag |
+| `KI_LIMIT_GESAMT` | `300` | Anfragen über alle Konten und Tag |
+| `SCHULPLANER_REG_CODE` | leer | ist er gesetzt, braucht man ihn zum Anlegen eines Kontos |
+| `KI_TESTMODUS` | leer | `1` liefert feste Antworten ohne echten Aufruf, zum Prüfen |
+
+Den Schlüssel gibt es unter <https://console.anthropic.com/settings/keys>.
+
+### Warum der Einladungscode wichtig ist
+
+Die Seite ist öffentlich erreichbar, jeder kann ein Konto anlegen. Ohne
+`SCHULPLANER_REG_CODE` könnte also jeder Fremde die KI auf deine Rechnung
+benutzen. Setz den Code, sobald ein Schlüssel hinterlegt ist.
+
+Die beiden Tageslimits sind die zweite Sicherung. Gezählt wird **vor** dem
+Aufruf, ein abgebrochener Aufruf zählt also mit. Lieber einmal zu viel gezählt
+als ein Aufruf, der Geld kostet und nirgends auftaucht.
+
+### Was die KI kostet
+
+Abgerechnet wird nach Ein- und Ausgabe. Ein Scan mit Foto und ein Satz
+Karteikarten liegen im Bereich weniger Cent, eine Erklärung darunter. Die
+aktuellen Preise stehen unter <https://anthropic.com/pricing>.
+
+Der Aufwand ist pro Aufgabe eingestellt: kurze Texte laufen auf `low`,
+Auswertungen von Fotos und das Erzeugen von Karten auf `medium`. Das hält
+Antwortzeit und Kosten unten.
+
+### Ohne Schlüssel: Texterkennung auf dem Gerät
+
+Ist kein Schlüssel gesetzt, fällt die Seite auf `tesseract.js` zurück. Sie
+lädt es beim ersten Scan nach und erkennt den Text im Browser selbst. Das Bild
+verlässt das Gerät nicht, und es kostet nichts.
 
 Beim ersten Mal kommen etwa 10 MB an Sprachmodell dazu (`deu.traineddata` und
 der wasm-Kern), danach liegen sie im Browser-Cache. Ein Scan dauert dann ein
@@ -163,15 +212,14 @@ Brauchbares heraus, landet der Rohtext im Textfeld statt in einer
 Fehlermeldung.
 
 Grenzen: gedruckter Text wird gut gelesen, Handschrift und Tafelbilder
-schlecht. Die Themen werden getrennt, aber nicht verstanden.
+schlecht. Die Themen werden getrennt, aber nicht verstanden. Karteikarten und
+Quiz gibt es auf diesem Weg nicht.
 
-## Was hier nicht geht
+### Grenze des Relais
 
-Karteikarten und Quizfragen erzeugen, Erklärungen und Spickzettel. Das braucht
-ein Sprachmodell und läuft nur in der Artifact-Fassung über Claude. Ein
-API-Schlüssel dafür gehört nicht in eine Seite, die öffentlich erreichbar ist,
-denn er wäre von jedem auslesbar. In den Server-Einstellungen wäre er sicher,
-das wäre der Weg, falls das später doch dazukommen soll.
-
-Die Oberfläche merkt von selbst, was verfügbar ist, und blendet die übrigen
-Knöpfe aus, statt Fehler zu zeigen.
+`/api/ki/text` und `/api/ki/json` nehmen den Prompt entgegen, den die Seite
+gebaut hat, und reichen ihn weiter. Wer ein Konto hat, kann darüber also
+beliebige Anfragen an Claude stellen, nicht nur die aus der Oberfläche. Der
+Einladungscode und die Tageslimits sind genau dafür da. Wer das enger haben
+will, baut die Prompts serverseitig in `ki.py` und nimmt vom Gerät nur noch
+die Daten entgegen.

@@ -666,8 +666,59 @@ async function webDatenLaden(konto) {
     state.cfg = Object.assign(state.cfg, d.cfg || {});
     saveLocal(); themaSetzen(); render();
   } catch (e) { srvFehler(e); }
+  initWebKI();
 }
 const srvPfad = coll => coll === "hausaufgaben" ? "/api/hausaufgabe/" : "/api/test/";
+
+// Claude laeuft in dieser Fassung ueber den eigenen Server. Der Schluessel
+// liegt dort in den Umgebungsvariablen und wird nie mit ausgeliefert.
+async function blobsZuBase64(bs) {
+  const liste = (bs instanceof Blob) ? [bs] : Array.from(bs || []);
+  const out = [];
+  for (const b of liste) {
+    out.push(await new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(String(fr.result));
+      fr.onerror = () => rej(new Error("Bild konnte nicht gelesen werden."));
+      fr.readAsDataURL(b);
+    }));
+  }
+  return out;
+}
+const AUFWAND = { quick: "low", default: "low", complex: "medium" };
+async function initWebKI() {
+  if (!SRV) return;
+  let g = null;
+  try { g = await api("/api/ki"); } catch (e) { return; }
+  if (!g || !g.aktiv) return;
+  const alsText = input => typeof input === "string"
+    ? input : (input || []).map(t => t && t.content).filter(Boolean).join("\n\n");
+  const schicken = async (pfad, input, opts) => {
+    const koerper = { prompt: alsText(input), effort: AUFWAND[(opts && opts.modelTier) || "default"] || "low" };
+    if (opts && opts.images) koerper.bilder = await blobsZuBase64(opts.images);
+    try {
+      return await api(pfad, "POST", koerper);
+    } catch (e) {
+      throw { code: (e && e.code === 429) ? "rate_limited" : "server", message: e && e.message };
+    }
+  };
+  const f = async (input, opts) => {
+    const r = await schicken("/api/ki/text", input, opts);
+    // Der Server streamt nicht, die Antwort kommt am Stueck. Damit die
+    // Oberflaeche nichts anders machen muss, wird onText einmal gerufen.
+    if (opts && opts.onText) opts.onText({ text: r.text, delta: r.text });
+    return { text: r.text, truncated: false };
+  };
+  f.json = async (input, opts) => {
+    const r = await schicken("/api/ki/json", input, Object.assign({ modelTier: "complex" }, opts || {}));
+    return r.wert;
+  };
+  const lim = { maxInputBytes: g.maxZeichen, images: g.bilder };
+  f.limits = async () => lim;
+  SAMPLE = f;
+  SAMPLE_LIMITS = lim;
+  render();
+}
 async function webAbmelden() {
   try { await api("/api/abmelden", "POST"); } catch (e) { }
   profil = null; ui.web = null; sheetZu(); zeigeOberflaeche();
@@ -760,6 +811,7 @@ function webGateHTML() {
     '<label class="f"><span>Benutzername</span><input type="text" id="w-name" value="' + esc(w.name) + '" autocomplete="username" autocapitalize="none" spellcheck="false" enterkeyhint="next"></label>' +
     '<label class="f"><span>Passwort</span><input type="password" id="w-pw" autocomplete="' + (neu ? "new-password" : "current-password") + '" enterkeyhint="go"></label>' +
     (neu ? '<label class="f"><span>Passwort wiederholen</span><input type="password" id="w-pw2" autocomplete="new-password" enterkeyhint="go"></label>' +
+      (w.codeNoetig ? '<label class="f"><span>Einladungscode</span><input type="text" id="w-code" autocomplete="off" autocapitalize="none"></label>' : "") +
       '<p class="sm dim">Mindestens 8 Zeichen. Schreib es dir auf, es gibt keine Zurücksetzung per Mail.</p>' : "") +
     (w.fehler ? '<p class="sm" style="color:var(--rot)">' + esc(w.fehler) + "</p>" : "") +
     '<button class="btn wide" data-act="' + (neu ? "wkonto" : "wanmelden") + '"' + (w.laeuft ? " disabled" : "") + ">" +
@@ -1601,7 +1653,7 @@ function sampleFehler(e, retry) {
     image_rejected: "Das Bild war nicht lesbar. Nochmal, näher dran und heller.",
     invalid_json: "Die Antwort war unbrauchbar. Versuch es nochmal oder kürze den Text.",
     cancelled: "Abgebrochen.", too_long: "Zu viel Text auf einmal. Teil es auf."
-  }[c] || "Das hat gerade nicht geklappt.";
+  }[c] || (e && e.message) || "Das hat gerade nicht geklappt.";
   window.__retry = retry;
   sheet("Hat nicht geklappt", '<div class="nudge alarm">' + svg("funke") + '<span class="tx"><b>' + esc(m) + '</b><span class="p">' + (c ? "Fehlercode: " + esc(c) : "") + "</span></span></div>",
     '<button class="btn ghost" data-act="sheetzu">Schließen</button>' + (retry ? '<button class="btn" data-act="retry">Nochmal</button>' : ""));
@@ -2203,12 +2255,18 @@ const A = {
     if (pw !== pw2) { w.fehler = "Die beiden Passwörter sind nicht gleich."; return gateRender(); }
     if (pw.length < 8) { w.fehler = "Das Passwort braucht mindestens 8 Zeichen."; return gateRender(); }
     w.laeuft = true; w.fehler = ""; gateRender();
+    const codeFeld = $("#w-code");
     try {
-      const r = await api("/api/konto", "POST", { name: w.name, passwort: pw });
+      const r = await api("/api/konto", "POST", {
+        name: w.name, passwort: pw, code: codeFeld ? codeFeld.value.trim() : ""
+      });
       ui.web = null; ui.webFehler = "";
       await webDatenLaden(r.konto);
     } catch (e) {
-      w.laeuft = false; w.fehler = (e && e.message) || "Anlegen ging nicht."; gateRender();
+      w.laeuft = false;
+      w.fehler = (e && e.message) || "Anlegen ging nicht.";
+      if (e && e.code === 403) w.codeNoetig = true;
+      gateRender();
     }
   },
   wpasswort: () => sheet("Passwort ändern",
@@ -2258,6 +2316,7 @@ const A = {
       for (const h of state.ha) { try { await api("/api/hausaufgabe/" + h.id, "PUT", h); } catch (e) { } }
       for (const t of state.tests) { try { await api("/api/test/" + t.id, "PUT", t); } catch (e) { } }
       zeigeOberflaeche();
+      initWebKI();
       return;
     }
     const p = { id: uid(), name: "", klasse: s.klasse, schulform: s.schulform, land: s.land, h: s.h, pin: "", erstellt: Date.now() };

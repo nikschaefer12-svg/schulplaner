@@ -34,6 +34,8 @@ from contextlib import closing
 
 from flask import Flask, g, jsonify, request, send_from_directory, session
 
+import ki
+
 DB_PATH = os.environ.get("SCHULPLANER_DB", "schulplaner.db")
 
 # Ist DATABASE_URL gesetzt, laeuft alles auf Postgres, sonst auf SQLite.
@@ -64,6 +66,15 @@ MAX_FEHLVERSUCHE = 10
 SPERRE_S = 15 * 60
 _fehlversuche = {}
 
+# Die Seite ist oeffentlich erreichbar. Ist ein Code gesetzt, braucht man ihn
+# zum Anlegen eines Kontos. Ohne das koennte jeder ein Konto anlegen und ueber
+# die KI-Aufrufe Geld des Betreibers ausgeben.
+REG_CODE = os.environ.get("SCHULPLANER_REG_CODE", "")
+
+# Tagesgrenzen fuer die KI, damit die Rechnung nicht davonlaeuft.
+KI_LIMIT_KONTO = int(os.environ.get("KI_LIMIT_KONTO", "80"))
+KI_LIMIT_GESAMT = int(os.environ.get("KI_LIMIT_GESAMT", "300"))
+
 NAME_MUSTER = re.compile(r"^[A-Za-z0-9_.\-]{3,32}$")
 ARTEN = ("ha", "test", "cfg", "faecher", "plan")
 # Obergrenzen, damit ein einzelnes Konto den Speicher nicht sprengt.
@@ -79,7 +90,8 @@ app.config.update(
     # auf http://localhost unsichtbar, dann kaeme man lokal nie hinein.
     SESSION_COOKIE_SECURE=bool(DATABASE_URL) or os.environ.get("SCHULPLANER_HTTPS") == "1",
     PERMANENT_SESSION_LIFETIME=60 * 60 * 24 * 90,
-    MAX_CONTENT_LENGTH=2 * 1024 * 1024,
+    # Fotos gehen als Base64 durch, das braucht Platz.
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024,
 )
 
 
@@ -162,6 +174,16 @@ def init_db():
             inhalt TEXT NOT NULL,
             geaendert {ts} NOT NULL DEFAULT 0,
             PRIMARY KEY (konto_id, art, schluessel)
+        )
+        """,
+        # Wie oft ein Konto die KI an einem Tag genutzt hat. Pro Tag eine
+        # Zeile, alte Zeilen stoeren nicht und werden beim Zaehlen ignoriert.
+        """
+        CREATE TABLE IF NOT EXISTS ki_nutzung (
+            konto_id BIGINT NOT NULL,
+            tag TEXT NOT NULL,
+            anzahl INTEGER NOT NULL DEFAULT 0,
+            PRIMARY KEY (konto_id, tag)
         )
         """,
         "CREATE INDEX IF NOT EXISTS eintraege_konto ON eintraege (konto_id, art)",
@@ -280,6 +302,8 @@ def konto_anlegen():
         return jsonify(fehler="Das Passwort braucht mindestens 8 Zeichen."), 400
     if len(passwort) > 256:
         return jsonify(fehler="Das Passwort ist zu lang."), 400
+    if REG_CODE and str(daten.get("code", "")).strip() != REG_CODE:
+        return jsonify(fehler="Der Einladungscode stimmt nicht.", code_noetig=True), 403
     d = db()
     if konto_laden(d, name=name) is not None:
         return jsonify(fehler="Den Namen gibt es schon. Nimm einen anderen."), 409
@@ -506,6 +530,85 @@ def alles_loeschen():
     return jsonify(ok=True)
 
 
+# ---- KI ------------------------------------------------------------------
+
+def ki_zaehler(d, konto_id):
+    """Wie viele Aufrufe heute schon gelaufen sind, fuer dieses Konto und gesamt."""
+    tag = time.strftime("%Y-%m-%d")
+    row = ex(d, "SELECT anzahl FROM ki_nutzung WHERE konto_id = ? AND tag = ?",
+             (konto_id, tag)).fetchone()
+    eigen = int(row["anzahl"]) if row else 0
+    gesamt = ex(d, "SELECT COALESCE(SUM(anzahl), 0) AS n FROM ki_nutzung WHERE tag = ?",
+                (tag,)).fetchone()["n"]
+    return tag, eigen, int(gesamt or 0)
+
+
+def ki_buchen(d, konto_id, tag):
+    row = ex(d, "SELECT anzahl FROM ki_nutzung WHERE konto_id = ? AND tag = ?",
+             (konto_id, tag)).fetchone()
+    if row:
+        ex(d, "UPDATE ki_nutzung SET anzahl = anzahl + 1 WHERE konto_id = ? AND tag = ?",
+           (konto_id, tag))
+    else:
+        ex(d, "INSERT INTO ki_nutzung (konto_id, tag, anzahl) VALUES (?, ?, 1)",
+           (konto_id, tag))
+    d.commit()
+
+
+@app.get("/api/ki")
+def ki_zustand():
+    row = angemeldet()
+    info = ki.grenzen()
+    if row is None:
+        return jsonify(info)
+    _, eigen, gesamt = ki_zaehler(db(), row["id"])
+    info["heute"] = eigen
+    info["rest"] = max(0, min(KI_LIMIT_KONTO - eigen, KI_LIMIT_GESAMT - gesamt))
+    return jsonify(info)
+
+
+def ki_aufruf(als_json):
+    row = angemeldet()
+    if row is None:
+        return jsonify(fehler="Nicht angemeldet."), 401
+    if not ki.verfuegbar():
+        return jsonify(fehler="Auf diesem Server ist kein API-Schluessel hinterlegt.",
+                       code="kein_schluessel"), 503
+    d = db()
+    tag, eigen, gesamt = ki_zaehler(d, row["id"])
+    if eigen >= KI_LIMIT_KONTO:
+        return jsonify(fehler="Dein Tageslimit von %d Anfragen ist erreicht. Morgen geht es weiter."
+                       % KI_LIMIT_KONTO, code="limit_konto"), 429
+    if gesamt >= KI_LIMIT_GESAMT:
+        return jsonify(fehler="Das Tageslimit des Servers ist erreicht.", code="limit_gesamt"), 429
+
+    koerper = json_koerper()
+    bilder = koerper.get("bilder") or []
+    if not isinstance(bilder, list):
+        bilder = []
+    # Gebucht wird vor dem Aufruf. Lieber einmal zu viel gezaehlt als ein
+    # Aufruf, der Geld kostet und nirgends auftaucht.
+    ki_buchen(d, row["id"], tag)
+    try:
+        if als_json:
+            return jsonify(wert=ki.wert(str(koerper.get("prompt", "")), bilder,
+                                        str(koerper.get("effort", "medium"))))
+        return jsonify(text=ki.text(str(koerper.get("prompt", "")), bilder,
+                                    str(koerper.get("effort", "low"))))
+    except ki.KiFehler as exc:
+        return jsonify(fehler=exc.text, code=exc.code), exc.status
+
+
+@app.post("/api/ki/text")
+def ki_text():
+    return ki_aufruf(False)
+
+
+@app.post("/api/ki/json")
+def ki_json():
+    return ki_aufruf(True)
+
+
 # ---- Seite und Zustand ---------------------------------------------------
 
 @app.get("/")
@@ -562,6 +665,8 @@ def diag():
         # Render legt den ausgelieferten Commit in diese Variable.
         "commit": os.environ.get("RENDER_GIT_COMMIT", "")[:7],
         "seite": seiten_stand(),
+        "ki": {"aktiv": ki.verfuegbar(), "modell": ki.grenzen()["modell"]},
+        "reg_code": bool(REG_CODE),
     }
     started = time.time()
     try:
